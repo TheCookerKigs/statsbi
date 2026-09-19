@@ -998,11 +998,19 @@ function updateOG() {
   const el = document.getElementById('stats8GDia');
   if (!el) return;
   if (now < ogStart) {
-    // Cuenta regresiva
+    // Cuenta regresiva — si falta mucho mostrar mes estimado
     const diff = Math.ceil((ogStart - now) / 86400000);
-    el.textContent = diff;
-    el.style.color = 'var(--cyan)';
-    el.style.fontSize = '';
+    if (diff > 60) {
+      el.textContent = 'Abr 2027';
+      el.style.color = 'var(--cyan)';
+      el.style.fontSize = '1rem';
+      const note8g = document.getElementById('og8Note');
+      if (note8g) note8g.textContent = 'fecha por confirmar';
+    } else {
+      el.textContent = diff + ' días';
+      el.style.color = 'var(--gold)';
+      el.style.fontSize = '';
+    }
   } else if (now >= ogStart && now < ogEnd) {
     const dia = Math.ceil((now - ogStart) / 86400000) || 1;
     const note8g = document.getElementById('og8Note');

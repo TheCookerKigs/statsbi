@@ -482,7 +482,7 @@
       <span class="welcome-tag">🏆 Liga ABE</span>
       <span class="welcome-tag">🧠 IA</span>
       <span class="welcome-tag">📊 Stats</span>
-      <span class="welcome-tag">🔥 8G 2026</span>
+      <span class="welcome-tag">🔥 8G 2027</span>
     </div>
     <button class="btn-primary" onclick="closeWelcome()">¡Entrar al análisis! 🏀</button>
     <p class="welcome-legal">Al continuar aceptas nuestros <a href="#" onclick="showLegal('terminos')" style="color:#00e5ff">Términos y Condiciones</a></p>
@@ -1159,7 +1159,7 @@ function renderPosiciones(data) {
     const camp = CAMPEONES[currentTemporada];
     const campData = camp ? (currentGenero==='M' ? camp.varonil : camp.femenil) : null;
     const isCampeon = campData && e.n === campData.nombre;
-    const coronaBadge = isCampeon ? '<span style="font-size:.9rem;margin-left:4px" title="Campeón 8G 2026">🏆</span>' : '';
+    const coronaBadge = isCampeon ? '<span style="font-size:.9rem;margin-left:4px" title="Campeón 8G 2027">🏆</span>' : '';
     return `<tr>
       <td><span class="${rankCls}">${e.r}</span></td>
       <td>${e.n}${coronaBadge}${ogBadge}</td>
@@ -1919,7 +1919,7 @@ function renderBracket(data) {
     <div class="champ-card">
       <div style="font-size:2.5rem">🏆</div>
       <div style="font-size:1.4rem;font-weight:900;color:#ffd740;margin:8px 0">${state.champ}</div>
-      <div style="font-size:.85rem;color:#8896b3">CAMPEÓN 8G 2026</div>
+      <div style="font-size:.85rem;color:#8896b3">CAMPEÓN 8G 2027</div>
     </div>` : `
     <div class="champ-card tbd-champ">
       <div style="font-size:2rem;opacity:.4">🏆</div>
@@ -2400,9 +2400,9 @@ function initFanZone(data) {
 
   // ── HOT TAKES ────────────────────────────────────────────
   const TAKES = [
-    {id:'t1',text:'Anáhuac Querétaro conquista el título varonil 8G 2026',yes:55,no:45},
+    {id:'t1',text:'Anáhuac Querétaro conquista el título varonil 8G 2027',yes:55,no:45},
     {id:'t2',text:'Tec Monterrey gana su cuarto campeonato femenil consecutivo',yes:62,no:38},
-    {id:'t3',text:'El 8G 2026 tiene el nivel más alto en la historia ABE',yes:78,no:22},
+    {id:'t3',text:'El 8G 2027 tiene el nivel más alto en la historia ABE',yes:78,no:22},
     {id:'t4',text:'Tec Monterrey gana el 8G femenil 2026 de nuevo',yes:55,no:45},
     {id:'t5',text:'Anáhuac Querétaro da la sorpresa y llega a la final',yes:49,no:51},
   ];
@@ -3066,7 +3066,7 @@ function renderRachas(data) {
     <div style="background:linear-gradient(135deg,rgba(255,215,64,.15),rgba(255,167,38,.08));border:2px solid #ffd74066;border-radius:16px;padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px">
       <div style="font-size:2.5rem;line-height:1">🏆</div>
       <div style="flex:1">
-        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#b8860b;margin-bottom:4px">Campeón 8G 2026 · ${genLabel}</div>
+        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#b8860b;margin-bottom:4px">Campeón 8G 2027 · ${genLabel}</div>
         <div style="font-size:1.4rem;font-weight:900;color:#ffd740;line-height:1.1">${campDatos.nombre}</div>
         ${campDatos.subcampeon ? `<div style="font-size:.72rem;color:#8896b3;margin-top:4px">🥈 Subcampeón: ${campDatos.subcampeon}${campDatos.tercero ? ' · 🥉 3°: '+campDatos.tercero : ''}</div>` : ''}
       </div>

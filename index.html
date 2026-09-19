@@ -3244,15 +3244,15 @@ async function loadEquiposFromSupabase() {
 
 // Usar datos live si están, si no usar hardcoded o histórico
 function getEquipos(genero) {
-  // Si es temporada actual, usar live o hardcoded
-  if (currentTemporada === '2025-26') {
+  // Temporada actual 2026-27 — usar VARONIL/FEMENIL en vivo
+  if (currentTemporada === '2026-27') {
     if (genero === 'M' && window.VARONIL_LIVE && window.VARONIL_LIVE.length > 0) return window.VARONIL_LIVE;
     if (genero === 'F' && window.FEMENIL_LIVE && window.FEMENIL_LIVE.length > 0) return window.FEMENIL_LIVE;
     return genero === 'M' ? VARONIL : FEMENIL;
   }
-  // Temporadas históricas
+  // Temporadas históricas (2025-26 y anteriores)
   const hist = TEMPORADAS[currentTemporada];
-  if (hist) return genero === 'M' ? hist.varonil : hist.femenil;
+  if (hist) return genero === 'M' ? (hist.varonil || []) : (hist.femenil || []);
   return genero === 'M' ? VARONIL : FEMENIL;
 }
 

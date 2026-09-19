@@ -1,0 +1,3376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ═══ FAVICON ═══════════════════════════════════════════ -->
+  <!-- Emoji favicon — funciona en Chrome, Firefox, Safari iOS -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+
+  <!-- ═══ GOOGLE SEARCH CONSOLE ═══════════════════════════════ -->
+  <meta name="google-site-verification" content="ynZyHmiMR3ETsatEHG4-seDzgM_VIpksNXBbDtK-snk" />
+
+  <!-- ═══ SEO BÁSICO ══════════════════════════════════════════ -->
+  <title>StatsBi · Estadísticas Liga ABE México · Basketball Intelligence</title>
+  <meta name="description" content="StatsBi es la plataforma de análisis de basquetbol universitario más completa de México. Estadísticas reales de la Liga ABE División I, simulador de partidos, bracket 8 Grandes, predictor y análisis con IA.">
+  <meta name="keywords" content="Liga ABE, basquetbol universitario México, estadísticas ABE, ABE División I, Ocho Grandes 2026, basquetbol universitario, StatsBi, HoopLink, Anáhuac Querétaro, Tec Santa Fe, UMAD, UPAEP, tabla general ABE">
+  <meta name="author" content="HoopLink">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#080c18">
+  <link rel="canonical" href="https://statsbi.mx">
+
+  <!-- ═══ OPEN GRAPH (redes sociales — WhatsApp, FB, Twitter) ══ -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://statsbi.mx">
+  <meta property="og:title" content="StatsBi · Estadísticas Liga ABE México">
+  <meta property="og:description" content="El mejor análisis de basquetbol universitario en México. Liga ABE DI 2026-27 — estadísticas, simulador, bracket y análisis con IA.">
+  <meta property="og:image" content="https://statsbi.mx/og-image.png">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="StatsBi by HoopLink">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="StatsBi · Liga ABE México">
+  <meta name="twitter:description" content="Estadísticas, simulador y análisis IA de la Liga ABE División I México.">
+
+  <!-- ═══ SCHEMA.ORG (Rich Results en Google) ════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsOrganization",
+    "name": "StatsBi · Basketball Intelligence",
+    "url": "https://statsbi.mx",
+    "description": "Plataforma de estadísticas y análisis de la Liga ABE División I de basquetbol universitario en México.",
+    "sport": "Basketball",
+    "areaServed": "México",
+    "sameAs": ["https://statsbi.mx"],
+    "publisher": {
+      "@type": "Organization",
+      "name": "HoopLink",
+      "url": "https://statsbi.mx"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "StatsBi",
+    "url": "https://statsbi.mx",
+    "description": "Estadísticas y análisis de la Liga ABE México — División I temporada 2025-26",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://statsbi.mx",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #080c18; --bg2: #0d1225; --bg3: #111830;
+      --cyan: #00e5ff; --gold: #ffd740; --green: #00e676;
+      --red: #ff5252; --pink: #ff80ab; --purple: #ce93d8;
+      --text: #e0e8ff; --text2: #8896b3; --border: #1e2d4a;
+    }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; }
+
+    /* MODAL BIENVENIDA */
+    .welcome-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .welcome-box { background: linear-gradient(135deg,#0d1225,#111830); border: 1px solid var(--cyan); border-radius: 20px; padding: 48px 40px; max-width: 480px; width: 90%; text-align: center; }
+    .welcome-box h1 { font-size: 2.2rem; margin: 16px 0 8px; } .welcome-box h1 span { color: var(--cyan); }
+    .welcome-box p { color: var(--text2); margin-bottom: 28px; font-size: 1.05rem; }
+    .welcome-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
+    .welcome-tag { background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3); color: var(--cyan); padding: 6px 14px; border-radius: 20px; font-size: .85rem; }
+    .btn-primary { background: linear-gradient(135deg,#00b8d4,#00e5ff); color: #000; border: none; padding: 16px 32px; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; width: 100%; transition: .2s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,229,255,.3); }
+    .welcome-legal { font-size: .75rem; color: var(--text2); margin-top: 12px; }
+
+    /* MODAL LOGIN/REGISTRO */
+    .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 8888; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .auth-overlay.active { display: flex; }
+    .auth-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 36px; max-width: 440px; width: 90%; }
+    .auth-box h2 { font-size: 1.6rem; margin-bottom: 8px; }
+    .auth-box h2 span { color: var(--cyan); }
+    .auth-tabs { display: flex; gap: 0; margin-bottom: 24px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .auth-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; color: var(--text2); font-size: .9rem; transition: .2s; }
+    .auth-tab.active { background: var(--cyan); color: #000; font-weight: 700; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .85rem; color: var(--text2); margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 10px; font-size: .95rem; outline: none; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--cyan); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-auth { background: linear-gradient(135deg,#00b8d4,#00e5ff); color: #000; border: none; padding: 12px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; transition: .2s; }
+    .btn-auth:hover { opacity: .9; }
+    .auth-error { color: var(--red); font-size: .85rem; margin-top: 8px; text-align: center; }
+    .auth-success { color: var(--green); font-size: .85rem; margin-top: 8px; text-align: center; }
+    .auth-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text2); font-size: 1.5rem; cursor: pointer; }
+    .auth-box { position: relative; }
+
+    /* HEADER */
+    header { background: rgba(8,12,24,.95); border-bottom: 1px solid var(--border); padding: 10px 16px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+    .logo { display: flex; flex-direction: column; }
+    .logo h1 { font-size: 1.4rem; font-weight: 800; }
+    .logo h1 span { color: var(--cyan); }
+    .logo-sub { font-size: .7rem; color: var(--text2); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .badge-activa { background: rgba(0,230,118,.12); color: var(--green); border: 1px solid rgba(0,230,118,.5); padding: 2px 8px; border-radius: 20px; font-size: .62rem; font-weight: 700; margin-left: 6px; vertical-align: middle; display: inline-block; letter-spacing: .05em; }
+    .visits-badge { font-size: .8rem; color: var(--text2); }
+    .btn-login { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: .85rem; transition: .2s; }
+    .btn-login:hover { background: var(--cyan); color: #000; }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: .8rem; }
+    .user-welcome { font-size: .85rem; color: var(--cyan); }
+
+    /* TICKER */
+    .ticker { background: rgba(0,0,0,.2); border-bottom: 1px solid var(--border); padding: 4px 0; overflow: hidden; display: flex; align-items: center; height: 24px; }
+    .ticker-inner { display: flex; align-items: center; white-space: nowrap; animation: tickerScroll 50s linear infinite; }
+    .ticker-item { padding: 0 20px; font-size: .68rem; color: #6a7a94; letter-spacing: .01em; line-height: 1; }
+    .ticker-item span { color: #7a8aa0; font-size: .68rem; }
+    .ticker-sep { color: #3a4a5a; padding: 0 4px; font-size: .68rem; }
+    @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* STATS BAR */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 20px; max-width: 1400px; margin: 0 auto; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .stat-label { font-size: .75rem; color: var(--text2); margin-bottom: 4px; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--cyan); }
+
+    /* TABS */
+    .tabs-wrapper { padding: 0 20px; max-width: 1400px; margin: 0 auto; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tab { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: .2s; position: relative; display: flex; align-items: center; gap: 6px; }
+    .tab.active { background: var(--cyan); color: #000; border-color: var(--cyan); font-weight: 700; }
+    .tab:hover:not(.active) { border-color: var(--cyan); color: var(--cyan); }
+    .tab .lock-icon { font-size: .75rem; opacity: .7; }
+
+    /* GENDER TABS */
+    .gender-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .gender-tab { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: .9rem; transition: .2s; }
+    .gender-tab.active { background: rgba(0,229,255,.15); border-color: var(--cyan); color: var(--cyan); font-weight: 700; }
+
+    /* TABLA POSICIONES */
+    .content { padding: 0 20px 40px; max-width: 1400px; margin: 0 auto; }
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg3); }
+    th { padding: 12px 16px; text-align: left; font-size: .8rem; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    td { padding: 12px 16px; border-top: 1px solid var(--border); font-size: .9rem; white-space: nowrap; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .rank { font-weight: 800; font-size: 1rem; }
+    .rank-1 { color: var(--gold); } .rank-2 { color: #c0c0c0; } .rank-3 { color: #cd7f32; }
+    .rank.og { color: var(--green); }
+    .badge-conf { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .co { background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .centro { background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .norte { background: rgba(255,215,64,.1); color: var(--gold); border: 1px solid rgba(255,215,64,.3); }
+    .bajio { background: rgba(206,147,216,.1); color: var(--purple); border: 1px solid rgba(206,147,216,.3); }
+    .pg { color: var(--green); font-weight: 700; } .pp { color: var(--red); font-weight: 700; }
+    .pos { color: var(--green); } .neg { color: var(--red); }
+    .badge-og { background: rgba(0,230,118,.15); color: var(--green); border: 1px solid rgba(0,230,118,.3); padding: 2px 7px; border-radius: 8px; font-size: .72rem; font-weight: 700; margin-left: 6px; }
+
+    /* LOCK SCREEN */
+    .lock-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; }
+    .lock-icon-big { font-size: 4rem; margin-bottom: 20px; }
+    .lock-screen h2 { font-size: 1.8rem; margin-bottom: 12px; }
+    .lock-screen h2 span { color: var(--cyan); }
+    .lock-screen p { color: var(--text2); margin-bottom: 28px; max-width: 400px; line-height: 1.6; }
+    .lock-benefits { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+    .lock-benefit { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: .85rem; color: var(--text2); }
+    .lock-benefit strong { color: var(--cyan); display: block; margin-bottom: 4px; }
+    .btn-register { background: linear-gradient(135deg,#00b8d4,#00e5ff); color: #000; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: .2s; }
+    .btn-register:hover { transform: translateY(-2px); }
+
+    /* H2H */
+    .h2h-selectors { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 24px; }
+    .vs-badge { font-size: 1.2rem; font-weight: 800; color: var(--gold); text-align: center; }
+    .h2h-select { width: 100%; background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 10px; font-size: .95rem; }
+    .h2h-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .h2h-bars { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .h2h-bar-row { display: grid; grid-template-columns: 60px 1fr 60px; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .h2h-bar-row .val { font-weight: 700; font-size: 1rem; }
+    .h2h-bar-row .val.a { color: var(--cyan); text-align: right; }
+    .h2h-bar-row .val.b { color: var(--pink); }
+    .bar-bg { height: 6px; background: var(--bg3); border-radius: 4px; overflow: hidden; position: relative; }
+    .bar-a { position: absolute; left: 0; height: 100%; background: var(--cyan); border-radius: 4px; }
+    .bar-b { position: absolute; right: 0; height: 100%; background: var(--pink); border-radius: 4px; }
+    .bar-label { font-size: .75rem; color: var(--text2); text-align: center; }
+    .radar-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    svg.radar { width: 100%; max-width: 300px; }
+
+    /* SIMULADOR */
+    .sim-selectors { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 20px; }
+    .sim-btn { background: linear-gradient(135deg,var(--cyan),#00b8d4); color: #000; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 20px; transition: .2s; }
+    .sim-btn:hover { opacity: .9; transform: translateY(-2px); }
+    .quarters-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+    .quarter-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+    .quarter-label { font-size: .75rem; color: var(--text2); margin-bottom: 8px; }
+    .quarter-score { font-size: 1.1rem; font-weight: 700; }
+    .final-score { background: linear-gradient(135deg,var(--bg2),var(--bg3)); border: 1px solid var(--cyan); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px; }
+    .final-teams { display: flex; justify-content: space-between; align-items: center; }
+    .final-team { font-size: 1rem; font-weight: 700; }
+    .final-pts { font-size: 2.5rem; font-weight: 900; }
+    .final-pts.winner { color: var(--green); }
+    .mvp-card { background: var(--bg2); border: 1px solid var(--gold); border-radius: 12px; padding: 16px; text-align: center; }
+    .mvp-label { font-size: .8rem; color: var(--gold); margin-bottom: 6px; }
+    .mvp-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+
+    /* ANALISIS AI */
+    .ai-selector { margin-bottom: 16px; }
+    .ai-btn { background: linear-gradient(135deg,#7b1fa2,#9c27b0); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-size: .95rem; font-weight: 700; cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 8px; }
+    .ai-btn:hover { opacity: .9; }
+    .ai-response { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; min-height: 100px; }
+    .ai-loading { display: flex; align-items: center; gap: 12px; color: var(--text2); }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ai-text { line-height: 1.7; font-size: .95rem; white-space: pre-wrap; }
+
+    /* MAPA CALOR */
+    /* MAPA DE PODER */
+    .poder-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .poder-legend{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--text2)}
+    .poder-legend-bar{width:100px;height:7px;border-radius:4px;background:linear-gradient(to right,#1565c0,#0288d1,#26a69a,#66bb6a,#ffee58,#ffa726,#ef5350)}
+    .poder-extremos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+    .poder-extremo{border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .poder-extremo.hot{background:linear-gradient(135deg,rgba(239,83,80,.15),rgba(255,167,38,.08));border:1px solid rgba(239,83,80,.4)}
+    .poder-extremo.cold{background:linear-gradient(135deg,rgba(21,101,192,.15),rgba(2,136,209,.08));border:1px solid rgba(2,136,209,.4)}
+    .poder-extremo-emoji{font-size:2rem;line-height:1}
+    .poder-extremo-info{flex:1}
+    .poder-extremo-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+    .poder-extremo.hot .poder-extremo-label{color:#ef9a9a}
+    .poder-extremo.cold .poder-extremo-label{color:#90caf9}
+    .poder-extremo-name{font-size:.95rem;font-weight:800}
+    .poder-extremo.hot .poder-extremo-name{color:#ff7043}
+    .poder-extremo.cold .poder-extremo-name{color:#42a5f5}
+    .poder-extremo-score{font-size:1.5rem;font-weight:900}
+    .poder-extremo.hot .poder-extremo-score{color:#ff5252}
+    .poder-extremo.cold .poder-extremo-score{color:#29b6f6}
+    .poder-table{width:100%;border-collapse:collapse}
+    .poder-table th{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
+    .poder-table th:first-child,.poder-table th:nth-child(2){text-align:left}
+    .poder-table td{padding:6px 8px;border-bottom:1px solid rgba(30,45,74,.4);font-size:.82rem;vertical-align:middle}
+    .poder-table tr:last-child td{border-bottom:none}
+    .poder-table tr:hover td{background:rgba(0,229,255,.04);transition:.15s}
+    .poder-team-name{font-weight:700;font-size:.85rem}
+    .poder-og-badge{font-size:.58rem;background:rgba(0,230,118,.15);color:#00e676;border:1px solid rgba(0,230,118,.3);padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:middle}
+    .poder-cell{text-align:center;font-size:.8rem;font-weight:600}
+    .poder-thermo-wrap{display:flex;align-items:center;gap:6px;justify-content:center}
+    .poder-thermo{display:inline-block;height:8px;border-radius:5px;min-width:4px;transition:width .4s}
+    .poder-score-pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.75rem;font-weight:800;min-width:38px;text-align:center}
+    /* legacy compat */
+    .heatmap-grid{display:none}
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 32px 20px; text-align: center; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .footer-links a { color: var(--text2); text-decoration: none; font-size: .85rem; cursor: pointer; }
+    .footer-links a:hover { color: var(--cyan); }
+    .footer-copy { font-size: .8rem; color: var(--text2); }
+    .footer-copy span { color: var(--cyan); }
+
+    /* LEGAL MODAL */
+    .legal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 7777; display: none; align-items: center; justify-content: center; }
+    .legal-overlay.active { display: flex; }
+    .legal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+    .legal-box h3 { font-size: 1.3rem; margin-bottom: 16px; color: var(--cyan); }
+    .legal-box p { font-size: .9rem; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+    .legal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text2); font-size: 1.5rem; cursor: pointer; }
+
+    @media(max-width:768px) {
+      .stats-bar { grid-template-columns: repeat(2,1fr); }
+      .h2h-grid { grid-template-columns: 1fr; }
+      .h2h-selectors { grid-template-columns: 1fr; }
+      .sim-selectors { grid-template-columns: 1fr; }
+      .quarters-grid { grid-template-columns: repeat(2,1fr); }
+      th, td { padding: 10px 12px; }
+    }
+  
+    /* ====== MOMENTUM ====== */
+    .momentum-wrap { padding: 16px 0; }
+    .mom-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+    .mom-title { color:#ffd740; margin:0 0 4px; font-size:1.4rem; }
+    .mom-sub { color:#8896b3; margin:0; font-size:.85rem; }
+    .mom-legend { display:flex; gap:10px; flex-wrap:wrap; }
+    .leg-item { font-size:.75rem; padding:4px 10px; border-radius:20px; background:var(--bg2); border:1px solid var(--border); }
+    .leg-item.fire { color:#ff6b35; border-color:rgba(255,107,53,.3); }
+    .leg-item.steady { color:#8896b3; }
+    .leg-item.drop { color:#ef5350; border-color:rgba(239,83,80,.3); }
+    .mom-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+    @media(max-width:640px) { .mom-grid { grid-template-columns:1fr; } }
+    .mom-card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:16px; border-left:3px solid var(--status-color,var(--border)); animation: momFade .4s ease both; transition:transform .2s,box-shadow .2s; }
+    .mom-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
+    @keyframes momFade { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .mom-rank-col { display:flex; flex-direction:column; align-items:center; min-width:36px; }
+    .mom-pos { font-size:1.3rem; font-weight:900; color:var(--text); line-height:1; }
+    .mom-seed-small { font-size:.65rem; color:#8896b3; margin-top:2px; }
+    .mom-explainer { background:rgba(0,229,255,.04); border:1px solid rgba(0,229,255,.15); border-radius:10px; padding:12px 14px; margin-bottom:18px; font-size:.76rem; color:#8896b3; line-height:1.5; }
+    .mom-explainer b { color:var(--text); }
+    .mom-card-top { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .mom-seed { font-size:1.4rem; font-weight:900; min-width:36px; }
+    .mom-info { flex:1; min-width:0; }
+    .mom-name { font-weight:700; font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mom-conf { font-size:.72rem; color:#8896b3; margin-top:2px; }
+    .mom-badge { font-size:.72rem; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+    .mom-bars { margin-bottom:12px; display:flex; flex-direction:column; gap:6px; }
+    .mom-bar-row { display:flex; align-items:center; gap:8px; }
+    .bar-label { font-size:.68rem; color:#8896b3; width:88px; flex-shrink:0; }
+    .bar-track { flex:1; height:6px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:4px; transition:width .8s; }
+    .bar-val { font-size:.72rem; font-weight:700; width:32px; text-align:right; }
+    .mom-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-bottom:12px; }
+    .mom-stat { text-align:center; background:rgba(0,0,0,.2); border-radius:8px; padding:6px 4px; }
+    .mstat-val { font-size:.82rem; font-weight:800; }
+    .mstat-lbl { font-size:.62rem; color:#8896b3; margin-top:2px; }
+    .mom-meter { margin-top:4px; }
+    .meter-track { position:relative; height:8px; background:linear-gradient(90deg,rgba(239,83,80,.3),rgba(136,150,179,.1),rgba(255,107,53,.3)); border-radius:4px; }
+    .meter-center { position:absolute; left:50%; top:-2px; width:2px; height:12px; background:#8896b3; border-radius:2px; transform:translateX(-50%); }
+    .meter-fill { position:absolute; top:0; height:100%; border-radius:4px; transition:all .8s; }
+    .meter-pointer { position:absolute; top:-5px; width:6px; height:18px; background:#fff; border-radius:3px; transform:translateX(-50%); transition:left .8s; box-shadow:0 0 8px rgba(255,255,255,.5); }
+    .meter-labels { display:flex; justify-content:space-between; margin-top:4px; font-size:.65rem; color:#8896b3; }
+    /* ====== FAN ZONE ====== */
+    .fz-wrap { padding:16px 0; }
+    .fz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+    .fz-title { color:#ce93d8; margin:0 0 4px; font-size:1.4rem; }
+    .fz-sub { color:#8896b3; margin:0; font-size:.85rem; }
+    .fz-live { display:flex; align-items:center; gap:6px; font-size:.75rem; font-weight:700; color:#ff5252; background:rgba(255,82,82,.1); border:1px solid rgba(255,82,82,.3); padding:5px 12px; border-radius:20px; }
+    .live-dot { width:8px; height:8px; background:#ff5252; border-radius:50%; animation:livePulse 1.4s infinite; }
+    @keyframes slideUpNotice { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+    .fz-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:700px) { .fz-grid { grid-template-columns:1fr; } }
+    .fz-card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:16px; animation:momFade .4s ease both; }
+    .fz-card-head { display:flex; align-items:flex-start; gap:10px; margin-bottom:16px; }
+    .fz-icon { font-size:1.4rem; }
+    .fz-card-title { font-weight:700; font-size:.95rem; margin-bottom:2px; }
+    .fz-card-sub { font-size:.72rem; color:#8896b3; }
+    .poll-btn { width:100%; display:flex; justify-content:space-between; align-items:center; background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:10px; margin-bottom:7px; cursor:pointer; font-size:.84rem; font-weight:600; transition:all .2s; }
+    .poll-btn:hover { border-color:var(--cyan); background:rgba(0,229,255,.06); }
+    .poll-record { font-size:.72rem; color:#8896b3; }
+    .poll-result { margin-bottom:10px; }
+    .poll-result.poll-winner .poll-team { color:#ffd740; font-weight:700; }
+    .poll-result-top { display:flex; justify-content:space-between; margin-bottom:4px; font-size:.82rem; }
+    .poll-bar-track { height:6px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; margin-bottom:2px; }
+    .poll-bar-fill { height:100%; border-radius:4px; transition:width .8s; }
+    .poll-votes { font-size:.65rem; color:#8896b3; }
+    .fz-vote-footer { margin-top:8px; text-align:center; }
+    .takes-list { display:flex; flex-direction:column; gap:12px; }
+    .take-item { background:var(--bg3); border-radius:10px; padding:12px; border:1px solid var(--border); }
+    .take-text { font-size:.82rem; font-style:italic; color:var(--text); margin-bottom:10px; line-height:1.4; }
+    .take-btns { display:flex; gap:8px; }
+    .take-btn { flex:1; padding:7px; border-radius:8px; border:1px solid var(--border); cursor:pointer; font-size:.78rem; font-weight:700; transition:all .2s; }
+    .take-btn.yes { background:rgba(0,230,118,.08); color:#00e676; border-color:rgba(0,230,118,.3); }
+    .take-btn.no { background:rgba(239,83,80,.08); color:#ef5350; border-color:rgba(239,83,80,.3); }
+    .take-btn:hover { transform:scale(1.03); }
+    .take-bars { display:flex; flex-direction:column; gap:5px; }
+    .take-bar-row { display:flex; align-items:center; gap:6px; }
+    .take-lbl { font-size:.7rem; width:44px; font-weight:700; }
+    .take-lbl.si { color:#00e676; }
+    .take-lbl.no { color:#ef5350; }
+    .take-track { flex:1; height:5px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
+    .take-fill { height:100%; border-radius:4px; transition:width .8s; }
+    .take-pct { font-size:.7rem; width:28px; text-align:right; font-weight:700; }
+    .pred-match { background:var(--bg3); border-radius:10px; padding:12px; margin-bottom:10px; border:1px solid var(--border); }
+    .pred-label { font-size:.7rem; color:#8896b3; margin-bottom:8px; }
+    .pred-teams { display:flex; align-items:center; gap:8px; }
+    .pred-btn { flex:1; background:var(--bg2); border:1px solid var(--border); color:var(--text); padding:8px; border-radius:8px; cursor:pointer; font-size:.78rem; font-weight:600; text-align:center; transition:all .2s; }
+    .pred-btn:hover { border-color:var(--cyan); }
+    .pred-btn.pred-picked { border-color:var(--cyan); background:rgba(0,229,255,.1); color:var(--cyan); }
+    .pred-vs { font-size:.72rem; color:#8896b3; font-weight:700; }
+    .pred-chosen { font-size:.72rem; color:#8896b3; margin-top:8px; text-align:center; }
+    .fans-board { display:flex; flex-direction:column; gap:8px; }
+    .fan-row { display:flex; align-items:center; gap:8px; background:var(--bg3); border-radius:10px; padding:10px 12px; border:1px solid var(--border); animation:momFade .4s ease both; }
+    .fan-rank { font-size:.9rem; font-weight:800; min-width:28px; }
+    .fan-badge { font-size:1rem; }
+    .fan-info { flex:1; min-width:0; }
+    .fan-name { font-size:.82rem; font-weight:700; display:block; }
+    .fan-streak { font-size:.68rem; color:#8896b3; }
+    .fan-pts { font-size:.82rem; font-weight:800; color:var(--cyan); }
+    .pts-rules { display:flex; flex-direction:column; gap:8px; }
+    .pts-rule { display:flex; align-items:center; gap:10px; background:var(--bg3); border-radius:8px; padding:8px 12px; font-size:.8rem; }
+    .pts-icon { font-size:1rem; }
+    .pts-rule span:nth-child(2) { flex:1; color:var(--text2); }
+    .pts-val { font-weight:800; color:#ffd740; }
+    .mis-puntos-row { gap:16px; }
+    .lock-tab .lock-icon { font-size:.7rem; opacity:.7; }
+  
+    /* ====== 🔬 LAB — DASHBOARD NASA ====== */
+    .lab-wrap { padding:16px 0; }
+    .lab-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+    .lab-title-block { display:flex; flex-direction:column; gap:4px; }
+    .lab-badge { display:inline-block; background:rgba(0,229,255,.15); border:1px solid rgba(0,229,255,.4); color:#00e5ff; font-size:.6rem; font-weight:800; padding:2px 8px; border-radius:4px; letter-spacing:.1em; width:fit-content; }
+    .lab-title { margin:4px 0 0; font-size:1.4rem; color:#fff; }
+    .lab-sub { color:#8896b3; font-size:.82rem; margin:0; }
+    .lab-signal { display:flex; align-items:center; gap:7px; font-size:.7rem; font-weight:700; color:#00e5ff; background:rgba(0,229,255,.06); border:1px solid rgba(0,229,255,.2); padding:6px 14px; border-radius:20px; letter-spacing:.05em; }
+    .signal-dot { width:7px; height:7px; background:#00e5ff; border-radius:50%; animation:labPulse 1.2s infinite; box-shadow:0 0 8px #00e5ff; }
+    @keyframes labPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+    /* KPI cards */
+    .lab-kpi-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-bottom:14px; }
+    .kpi-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:14px; text-align:center; transition:transform .2s,box-shadow .2s; position:relative; overflow:hidden; }
+    .kpi-card::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 0,rgba(0,229,255,.05),transparent 70%); pointer-events:none; }
+    .kpi-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.3); }
+    .kpi-icon { font-size:1.3rem; margin-bottom:6px; }
+    .kpi-val { font-size:1.15rem; font-weight:900; line-height:1; margin-bottom:4px; }
+    .kpi-label { font-size:.7rem; font-weight:700; color:var(--text2); margin-bottom:2px; }
+    .kpi-sub { font-size:.62rem; color:#8896b3; }
+
+    /* Panels */
+    .lab-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    .lab-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+    @media(max-width:800px) { .lab-grid-2,.lab-grid-3 { grid-template-columns:1fr; } }
+    .lab-panel { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:14px; }
+    .lab-panel-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+    .lab-panel-icon { font-size:1.2rem; margin-top:1px; }
+    .lab-panel-title { font-size:.88rem; font-weight:800; margin-bottom:2px; }
+    .lab-panel-sub { font-size:.67rem; color:#8896b3; line-height:1.3; }
+
+    /* Rows */
+    .lab-list { display:flex; flex-direction:column; gap:7px; }
+    .lab-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .lab-row:last-child { border-bottom:none; }
+    .lab-row-rank { font-size:.9rem; font-weight:900; min-width:18px; text-align:center; }
+    .lab-row-info { flex:1; min-width:0; }
+    .lab-row-name { font-size:.78rem; font-weight:700; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lab-row-sub { font-size:.65rem; display:block; margin-top:1px; }
+    .lab-row-right { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+    .lab-row-val { font-size:.82rem; font-weight:800; }
+    .mini-bar-track { height:4px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; margin-top:3px; }
+    .mini-bar-fill { height:100%; border-radius:3px; transition:width .8s; }
+
+    /* DNA */
+    .lab-dna-grid { display:flex; flex-direction:column; gap:8px; }
+    .dna-group { display:flex; flex-direction:column; gap:4px; }
+    .dna-label { font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:20px; border:1px solid; width:fit-content; letter-spacing:.04em; }
+    .dna-teams { display:flex; flex-wrap:wrap; gap:4px; }
+    .dna-team { font-size:.65rem; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:2px 8px; border-radius:6px; color:#8896b3; }
+
+    /* Insights NASA */
+    .lab-insights-panel { }
+    .lab-insights-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+    .insight-card { background:var(--bg3); border:1px solid; border-radius:12px; padding:14px; transition:transform .2s,box-shadow .2s; }
+    .insight-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.3); }
+    .insight-top { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+    .insight-icon { font-size:1.1rem; }
+    .insight-title { font-size:.7rem; font-weight:800; letter-spacing:.03em; text-transform:uppercase; }
+    .insight-val { font-size:1rem; font-weight:900; color:#fff; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .insight-desc { font-size:.72rem; color:#8896b3; line-height:1.4; }
+  </style>
+</head>
+<body>
+
+<!-- AVISO DATOS ABE -->
+<div id="abeDataNotice" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#0d1225,#111830);border:1px solid rgba(0,229,255,.25);border-radius:14px;padding:14px 20px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9990;display:flex;align-items:flex-start;gap:12px;animation:slideUpNotice .5s ease .8s both;">
+  <span style="font-size:1.3rem;flex-shrink:0">📡</span>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:.78rem;font-weight:700;color:#00e5ff;margin-bottom:3px">Datos en tiempo real · Temporada 2026-27</div>
+    <div style="font-size:.72rem;color:#8896b3;line-height:1.5">StatsBi refleja los datos más recientes disponibles de la Liga ABE. Si la ABE no ha publicado resultados, nuestras estadísticas tampoco los mostrarán — dependemos de su actualización oficial. ¡No es magia, es basquetbol! 🏀</div>
+  </div>
+  <button onclick="document.getElementById('abeDataNotice').style.display='none';sessionStorage.setItem('abeSeen','1')" style="background:none;border:none;color:#8896b3;cursor:pointer;font-size:1.2rem;flex-shrink:0;padding:2px 0 0;line-height:1">✕</button>
+</div>
+<script>if(sessionStorage.getItem('abeSeen'))document.getElementById('abeDataNotice').style.display='none';</script>
+
+<!-- BIENVENIDA -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-box">
+    <div style="font-size:3rem">🏀</div>
+    <h1>Somos <span><span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span></span></h1>
+    <p style="color:#8896b3;font-size:.95rem;font-style:italic">Basketball Intelligence · by HoopLink</p>
+    <p>El <span style="color:#00e5ff;font-weight:700">mejor análisis</span> de basquetbol universitario en México</p>
+    <p style="color:#8896b3;margin-bottom:20px;font-size:.9rem">Estadísticas · Análisis con IA · Simulador · Bracket<br>Todo sobre la <span style="color:#ffd740">Liga ABE</span></p>
+    <div class="welcome-tags">
+      <span class="welcome-tag">🏆 Liga ABE</span>
+      <span class="welcome-tag">🧠 IA</span>
+      <span class="welcome-tag">📊 Stats</span>
+      <span class="welcome-tag">🔥 8G 2026</span>
+    </div>
+    <button class="btn-primary" onclick="closeWelcome()">¡Entrar al análisis! 🏀</button>
+    <p class="welcome-legal">Al continuar aceptas nuestros <a href="#" onclick="showLegal('terminos')" style="color:#00e5ff">Términos y Condiciones</a></p>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuth()">×</button>
+    <h2><span>🔐</span> Accede a <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span></h2>
+    <p style="color:#8896b3;margin-bottom:16px;font-size:.85rem">Crea tu cuenta gratis y desbloquea todas las funciones</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sesión</div>
+      <div class="auth-tab" id="tabRegistro" onclick="switchAuthTab('registro')">Crear Cuenta</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="formLogin">
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="loginEmail" placeholder="tu@correo.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" onclick="handleLogin()">Entrar 🏀</button>
+      <p class="auth-error" id="loginError"></p>
+      <p style="text-align:center;margin:10px 0 0">
+        <a href="#" onclick="event.preventDefault();showForgotPassword()" style="color:#8896b3;font-size:.82rem;text-decoration:none">¿Olvidaste tu contraseña?</a>
+      </p>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="formRegistro" style="display:none">
+      <div class="form-group">
+        <label>Usuario (único)</label>
+        <input type="text" id="regUsername" placeholder="hoopfan2026">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="regNombre" placeholder="Carlos">
+        </div>
+        <div class="form-group">
+          <label>Apellido</label>
+          <input type="text" id="regApellido" placeholder="García">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="regEmail" placeholder="tu@correo.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="regPassword" placeholder="Mínimo 8 caracteres">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha de nacimiento</label>
+          <input type="date" id="regFecha">
+        </div>
+        <div class="form-group">
+          <label>Género</label>
+          <select id="regGenero">
+            <option value="">Seleccionar</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-auth" onclick="handleRegistro()">Crear Cuenta Gratis 🚀</button>
+      <p class="auth-error" id="regError"></p>
+      <p class="auth-success" id="regSuccess"></p>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL MODAL -->
+<div class="legal-overlay" id="legalOverlay">
+  <div class="legal-box">
+    <button class="legal-close" onclick="closeLegal()">×</button>
+    <div id="legalContent"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <h1><span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> <small style="font-size:.6em;color:#8896b3;font-weight:400">Basketball Intelligence · by HoopLink</small> <span class="badge-activa">ACTIVA</span></h1>
+      <span class="logo-sub">Liga ABE México · Temporada 2026-27 · División I &nbsp;<span id="syncBadge" style="font-size:.65em;opacity:.7">⏳ verificando datos...</span></span>
+    </div>
+    <div class="header-right">
+      <span class="visits-badge" id="visitsBadge">● cargando visitas...</span>
+      <div id="authBtns">
+        <button class="btn-login" onclick="openAuth()">🔑 Iniciar Sesión</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <!-- se llena con JS -->
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-card">
+  <div class="stat-label">T. Regular</div>
+  <div class="stat-value" id="statsPartidos" style="font-size:1.4rem">—</div>
+  <div id="jornadaNote" style="font-size:.6rem;color:#8896b3;margin-top:2px">sin contar 8G</div>
+</div>
+<div class="stat-card">
+  <div class="stat-label">8 Grandes</div>
+  <div class="stat-value" id="stats8GDia" style="font-size:1.4rem">—</div>
+  <div id="og8Note" style="font-size:.6rem;color:#8896b3;margin-top:2px">de 6 días</div>
+</div>
+  <div class="stat-card"><div class="stat-label">Eq. Varonil</div><div class="stat-value">19</div></div>
+  <div class="stat-card"><div class="stat-label">Eq. Femenil</div><div class="stat-value">16</div></div>
+
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('posiciones')">🏅 Posiciones</div>
+    <div class="tab" onclick="switchTab('calor')">🌡️ Poder</div>
+    <div class="tab" onclick="switchTab('h2h')">⚔️ H2H <span class="lock-icon" id="lockH2H">🔒</span></div>
+    <div class="tab" onclick="switchTab('simulador')">🎮 Simulador <span class="lock-icon" id="lockSim">🔒</span></div>
+    <div class="tab" onclick="switchTab('analisis')">🧠 Análisis AI <span class="lock-icon" id="lockAI">🔒</span></div>
+    <div class="tab" onclick="switchTab('bracket')">🏆 Bracket</div>
+    <div class="tab" onclick="switchTab('predictor')">🔮 Predictor</div>
+    <div class="tab" onclick="switchTab('rachas')">⚡ Élite</div>
+    <div class="tab" onclick="switchTab('momentum')">📈 Momentum <span id="lockMom" style="font-size:.7rem;opacity:.7">🔒</span></div>
+    <div class="tab" onclick="switchTab('fanzone')">🗳️ Fan Zone <span id="lockFan" style="font-size:.7rem;opacity:.7">🔒</span></div>
+    <div class="tab" onclick="switchTab('lab')">🔬 Lab</div>
+    <div class="tab" onclick="switchTab('glosario')">📖 Guía</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+    <div class="gender-tabs" id="genderTabs" style="margin-bottom:0">
+      <div class="gender-tab active" onclick="switchGenero('M')">♂ Varonil</div>
+      <div class="gender-tab" onclick="switchGenero('F')">♀ Femenil</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:.8rem;color:var(--text2)">📅 Temporada:</span>
+      <select id="temporadaSelect" onchange="switchTemporada(this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--cyan);padding:6px 12px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;outline:none">
+        <option value="2025-26" selected>2025-26 (Actual)</option>
+        <option value="2024-25">2024-25</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENIDO -->
+<div class="content" id="mainContent">
+  <!-- se llena dinámicamente -->
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a onclick="showLegal('terminos')" style="color:#00e5ff">Términos y Condiciones</a>
+    <a onclick="showLegal('privacidad')" style="color:#00e5ff">Aviso de Privacidad</a>
+    <a onclick="showLegal('contacto')" style="color:#00e5ff">Contacto</a>
+  </div>
+  <p class="footer-copy"><span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> · Basketball Intelligence · by HoopLink<br>
+  Estadísticas Liga ABE México · Temporada 2026-27 · División I · StatsBi no está afiliado ni patrocinado por la ABE<br>
+  Análisis AI · Powered by Claude · <span>hola@statsbi.mx</span><br>
+  <span style="color:#8896b3;font-size:.75rem">© 2026 HoopLink · Todos los derechos reservados · Monterrey, N.L., México</span></p>
+</footer>
+
+<script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+var supabase;
+var SUPABASE_URL = 'https://qooinautuwcjrgcihggy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ktIZWc0WS9Qe9FlW_6a8Tg_tMgtSSiu';
+
+// ============================================================
+// DATOS ABE — Equipos varonil y femenil (fuente: abemexico.org)
+// ============================================================
+// ============================================================
+// VARIABLES GLOBALES DE ESTADO
+// ============================================================
+var currentTab = 'posiciones';
+var currentGenero = 'M';
+var currentTemporada = '2026-27';
+var isLoggedIn = false;
+var currentUser = null;
+
+// ============================================================
+// DATOS HISTÓRICOS POR TEMPORADA
+// Al subir/bajar equipos, actualizar aquí cada año
+// ============================================================
+// ── CAMPEONES CONFIRMADOS ─────────────────────────────────
+// Fuente: conecta.tec.mx / ABE oficial · Ocho Grandes 2026
+var CAMPEONES = {
+  '2025-26': {
+    femenil: { nombre: 'Tec CEM', emoji: '🏆', subcampeon: 'Tec Monterrey', tercero: 'Tec Toluca' },
+    varonil:  { nombre: 'Tec Toluca', emoji: '🏆', subcampeon: 'UPAEP Águilas', tercero: 'Anáhuac Querétaro' }
+  },
+  '2024-25': {
+    varonil:  { nombre: 'Tec Santa Fe', emoji: '🏆', subcampeon: 'UMAD Tigres Blancos' },
+    femenil:  { nombre: 'Tec Monterrey', emoji: '🏆', subcampeon: 'UANL Tigras' }
+  }
+};
+
+var TEMPORADAS = {
+  '2024-25': {
+    varonil: [
+      {r:1,n:'Tec Santa Fe',c:'Centro',pg:28,pp:8,pj:36,pf:2720,pc:2280},
+      {r:2,n:'UMAD Tigres Blancos',c:'Centro',pg:27,pp:9,pj:36,pf:2640,pc:2190},
+      {r:3,n:'Tec Puebla',c:'Centro',pg:26,pp:10,pj:36,pf:2580,pc:2300},
+      {r:4,n:'Inter Puebla',c:'Centro',pg:25,pp:11,pj:36,pf:2500,pc:2250},
+      {r:5,n:'UPAEP Águilas',c:'Bajío',pg:24,pp:12,pj:36,pf:2480,pc:2288},
+      {r:6,n:'Gallos CEU',c:'Norte',pg:20,pp:16,pj:36,pf:2200,pc:2100},
+      {r:7,n:'Anáhuac Querétaro',c:'Bajío',pg:19,pp:17,pj:36,pf:2180,pc:2160},
+      {r:8,n:'Tec Toluca',c:'Centro',pg:18,pp:18,pj:36,pf:2100,pc:2080},
+      {r:9,n:'UDLAP Aztecas',c:'Bajío',pg:14,pp:22,pj:36,pf:1980,pc:2100},
+      {r:10,n:'Borregos Hidalgo',c:'Centro',pg:12,pp:24,pj:36,pf:1900,pc:2150},
+      {r:11,n:'Borregos Monterrey',c:'Norte',pg:11,pp:25,pj:36,pf:1860,pc:2200},
+      {r:12,n:'CETYS',c:'Norte',pg:10,pp:26,pj:36,pf:1820,pc:2250},
+      {r:13,n:'UP CDMX',c:'Centro',pg:9,pp:27,pj:36,pf:1780,pc:2300},
+      {r:14,n:'Montrer',c:'Bajío',pg:8,pp:28,pj:36,pf:1740,pc:2350},
+      {r:15,n:'Tec Guadalajara',c:'Bajío',pg:8,pp:28,pj:36,pf:1720,pc:2360},
+      {r:16,n:'UANE Osos',c:'Norte',pg:6,pp:30,pj:36,pf:1640,pc:2500},
+      {r:17,n:'UACH Dorados',c:'Norte',pg:5,pp:31,pj:36,pf:1600,pc:2550},
+      {r:18,n:'Anáhuac Xalapa',c:'Centro',pg:4,pp:32,pj:36,pf:1560,pc:2600},
+      {r:19,n:'UANL Tigres',c:'Norte',pg:3,pp:33,pj:36,pf:1500,pc:2650},
+    ],
+    femenil: [
+      {r:1,n:'Tec Monterrey',c:'Norte',pg:24,pp:2,pj:26,pf:1920,pc:1540},
+      {r:2,n:'UANL Tigras',c:'Norte',pg:22,pp:4,pj:26,pf:1800,pc:1560},
+      {r:3,n:'Tec Toluca',c:'Centro',pg:21,pp:5,pj:26,pf:1770,pc:1580},
+      {r:4,n:'Tec CEM',c:'Centro',pg:20,pp:6,pj:26,pf:1700,pc:1560},
+      {r:5,n:'UPAEP Águilas F',c:'Bajío',pg:19,pp:7,pj:26,pf:1680,pc:1590},
+      {r:6,n:'CETYS',c:'Norte',pg:18,pp:8,pj:26,pf:1600,pc:1520},
+      {r:7,n:'Tec Guadalajara F',c:'Bajío',pg:16,pp:10,pj:26,pf:1480,pc:1500},
+      {r:8,n:'Gallos CEU F',c:'Norte',pg:15,pp:11,pj:26,pf:1440,pc:1510},
+      {r:9,n:'UP CDMX F',c:'Centro',pg:12,pp:14,pj:26,pf:1320,pc:1480},
+      {r:10,n:'UDLAP Aztecas F',c:'Bajío',pg:11,pp:15,pj:26,pf:1260,pc:1500},
+      {r:11,n:'Anáhuac Querétaro F',c:'Bajío',pg:9,pp:17,pj:26,pf:1150,pc:1540},
+      {r:12,n:'UACH Dorados F',c:'Norte',pg:8,pp:18,pj:26,pf:1100,pc:1560},
+      {r:13,n:'UANE Osas F',c:'Norte',pg:5,pp:21,pj:26,pf:940,pc:1620},
+    ]
+  }
+};
+
+// Temporada actual 2025-26 — Datos 100% REALES leídos DIRECTAMENTE de abemexico.org desde Chrome (abril 2026)
+// Varonil: 19 equipos, 36 JJ (19 equipos × 2 - 2 propios = 36). Clasificados 8G: top 8 con og:true
+var VARONIL = [
+  {r:1,n:'CETYS Mexicali',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:2,n:'CEU',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:3,n:'Tec Guadalajara',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:4,n:'Tec Monterrey',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:5,n:'Tec Puebla',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:6,n:'Tec Santa Fe',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:7,n:'Tec Toluca',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:8,n:'UANE',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:9,n:'Anáhuac Querétaro',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:10,n:'Anáhuac Xalapa',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:11,n:'UACJ',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:12,n:'UANL',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:13,n:'UDLAP',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:14,n:'Interamericana',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:15,n:'UMAD',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:16,n:'Montrer',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:17,n:'UP México',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:18,n:'UPAEP',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:19,n:'UV',c:'Sur',pg:0,pp:0,pj:0,pf:0,pc:0}
+];var FEMENIL = [
+  {r:1,n:'CETYS Tijuana F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:2,n:'Tec CEM F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:3,n:'Tec Guadalajara F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:4,n:'Tec Hidalgo F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:5,n:'Tec Monterrey F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:6,n:'Tec Toluca F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:7,n:'Anáhuac Norte F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:8,n:'Anáhuac Sur F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:9,n:'UANL F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:10,n:'UDLAP F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:11,n:'UDEM F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:12,n:'Interamericana F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:13,n:'Modelo de Mérida F',c:'Sureste',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:14,n:'UPAEP F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:15,n:'UVAQ F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0}
+];
+
+function updateAuthUI() {
+  const authBtns = document.getElementById('authBtns');
+  if (!authBtns) return;
+  const display = currentUser?.email?.split('@')[0] || 'Fan';
+  if (isLoggedIn) {
+    authBtns.innerHTML = `<span class="user-welcome">👋 ${display}</span> <button class="btn-logout" onclick="handleLogout()">Salir</button>`;
+    ['lockH2H','lockSim','lockAI','lockMom','lockFan'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  } else {
+    authBtns.innerHTML = `<button class="btn-login" onclick="openAuth()">🔑 Iniciar Sesión</button>`;
+    ['lockH2H','lockSim','lockAI','lockMom','lockFan'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'inline'; });
+  }
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  document.getElementById('loginError').textContent = '';
+  if (!email || !password) { document.getElementById('loginError').textContent = 'Completa todos los campos'; return; }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById('loginError').textContent = 'Correo o contraseña incorrectos'; }
+  else { closeAuth(); renderContent(); }
+}
+
+async function handleRegistro() {
+  const username = document.getElementById('regUsername').value.trim();
+  const nombre = document.getElementById('regNombre').value.trim();
+  const apellido = document.getElementById('regApellido').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPassword').value;
+  const fecha = document.getElementById('regFecha').value;
+  const genero = document.getElementById('regGenero').value;
+  const errEl = document.getElementById('regError');
+  const okEl = document.getElementById('regSuccess');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!username) { errEl.textContent = 'Escribe un nombre de usuario'; return; }
+  if (!nombre) { errEl.textContent = 'Escribe tu nombre'; return; }
+  if (!email || !email.includes('@')) { errEl.textContent = 'Correo electrónico inválido'; return; }
+  if (!pass || pass.length < 8) { errEl.textContent = 'Contraseña mínimo 8 caracteres'; return; }
+  const btn = document.querySelector('#formRegistro .btn-auth');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creando cuenta...'; }
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email, password: pass,
+      options: { data: { username, nombre_completo: nombre + (apellido ? ' ' + apellido : ''), fecha_nacimiento: fecha || null, genero: genero || null } }
+    });
+    if (error) {
+      errEl.textContent = error.message === 'User already registered' ? 'Este correo ya está registrado' : error.message;
+    } else {
+      if (data.user) {
+        await supabase.from('usuarios').insert({ id: data.user.id, username, email, nombre_completo: nombre + (apellido ? ' ' + apellido : ''), fecha_nacimiento: fecha || null, genero: genero || null });
+      }
+      okEl.textContent = '✅ ¡Cuenta creada! Revisa tu correo — si no lo ves, checa la carpeta de No deseados/Spam 📧';
+      setTimeout(() => switchAuthTab('login'), 3000);
+    }
+  } catch(e) {
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Crear Cuenta Gratis 🚀'; }
+  }
+}
+function showForgotPassword() {
+  // Ocultar tabs de login/registro y mostrar forgot
+  document.querySelectorAll('.auth-tab-btn').forEach(b => b.style.opacity = '.4');
+  document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+  document.getElementById('formForgot').style.display = 'block';
+  document.getElementById('forgotError').textContent = '';
+  document.getElementById('forgotSuccess').textContent = '';
+  openAuth();
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  const errEl = document.getElementById('forgotError');
+  const okEl = document.getElementById('forgotSuccess');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!email || !email.includes('@')) { errEl.textContent = 'Ingresa un correo válido'; return; }
+  const btn = document.querySelector('#formForgot .btn-auth');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://statsbi.mx'
+    });
+    if (error) {
+      errEl.textContent = 'Error: ' + error.message;
+    } else {
+      okEl.textContent = '✅ ¡Listo! Revisa tu correo — el link llega en segundos. Si no lo ves, checa No deseados.';
+    }
+  } catch(e) {
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 Enviar link de recuperación'; }
+  }
+}
+
+async function handleResetPassword() {
+  const p1 = document.getElementById('resetPass1').value;
+  const p2 = document.getElementById('resetPass2').value;
+  const errEl = document.getElementById('resetError');
+  const okEl = document.getElementById('resetSuccess');
+  errEl.textContent = ''; okEl.textContent = '';
+  if (!p1 || p1.length < 8) { errEl.textContent = 'La contraseña debe tener mínimo 8 caracteres'; return; }
+  if (p1 !== p2) { errEl.textContent = 'Las contraseñas no coinciden'; return; }
+  const btn = document.querySelector('#formReset .btn-auth');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+  try {
+    const { error } = await supabase.auth.updateUser({ password: p1 });
+    if (error) {
+      errEl.textContent = 'Error: ' + error.message;
+    } else {
+      okEl.textContent = '✅ ¡Contraseña actualizada! Ya puedes iniciar sesión.';
+      setTimeout(() => { switchAuthTab('login'); }, 2500);
+    }
+  } catch(e) {
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Guardar nueva contraseña'; }
+  }
+}
+
+async function handleLogout() {
+  await supabase.auth.signOut();
+  renderContent();
+}
+
+// ============================================================
+// VISITAS
+// ============================================================
+async function loadVisitas() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const url = `${SUPABASE_URL}/rest/v1/visitas?fecha=eq.${today}`;
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    // Leer
+    const res = await fetch(url, { headers });
+    const data = await res.json();
+    const badge = document.getElementById('visitsBadge');
+    if (data && data.length > 0) {
+      const nuevoCont = data[0].contador + 1;
+      badge.textContent = `● ${nuevoCont} visitas hoy`;
+      await fetch(url, { method: 'PATCH', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ contador: nuevoCont }) });
+    } else {
+      badge.textContent = '● 1 visita hoy';
+      await fetch(`${SUPABASE_URL}/rest/v1/visitas`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ contador: 1, fecha: today }) });
+    }
+  } catch(e) {
+    document.getElementById('visitsBadge').textContent = '● visitas hoy';
+  }
+}
+
+// ============================================================
+// TICKER
+// ============================================================
+function initTicker() {
+  const noticias = [
+    '🏆 Tec Toluca · CAMPEONES 8G 2026 Varonil · 68-60 vs UPAEP · ¡Primer título!',
+    '🏆 Tec CEM · CAMPEONAS 8G 2026 Femenil · 63-58 vs Tec Monterrey · ¡Primer título!',
+    '🥈 UPAEP Águilas · Subcampeones varonil 8G 2026',
+    '🥈 Tec Monterrey · Subcampeonas femenil 8G 2026',
+    '🥉 Anáhuac Querétaro · 3er lugar varonil · Mejor temporada regular',
+    '🥉 Tec Toluca F · 3er lugar femenil · 78-58 vs Tec Guadalajara',
+    'Anáhuac Querétaro · 29-7 · 1° varonil 2025-26',
+    'Tec Santa Fe · 29-7 · 2° varonil · Campeón defensor',
+    'UMAD Tigres Blancos · 28-8 · 4° varonil · Campeón 2023 y 2024',
+    'Top 8G varonil: Anáhuac Qro · Tec SF · Tec Toluca · UMAD · UPAEP · Inter · UANL · Tec Puebla',
+    'Top 8G femenil: Tec MTY · Tec CEM · Tec Toluca · Tec Gdl · UANL · CETYS · UPAEP · Tec Hidalgo',
+    'Liga ABE DI 2026-27 · 19 equipos varonil · 16 femenil',
+    'Borregos Monterrey · Tricampeonas femenil 2025 · A defender el trono',
+    'Tec Santa Fe venció a UMAD en la final 2025 · 60-58',
+    'Análisis IA disponible · Regístrate gratis en statsbi.mx',
+    'Datos de abemexico.org + vivabasquet.com + nbm.com.mx',
+    'statsbi.mx · Basketball Intelligence by HoopLink',
+    'Ocho Grandes 2026 · Transmisión por AYM Sports y live.tec',
+    'H2H · Simulador · Análisis AI · Inicia sesión para desbloquear',
+  ];
+  const el = document.getElementById('tickerInner');
+  if (!el) return;
+  const sep = '<span class="ticker-sep">●</span>';
+  const text = noticias.map(n => `<span class="ticker-item">${n}</span>${sep}`).join('');
+  el.innerHTML = text + text;
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = '';
+}
+
+// ============================================================
+// OG COUNTDOWN
+// ============================================================
+function updateOG() {
+  // OG 2026: 26 Abr - 2 May (hora CST = UTC-6)
+  const ogStart = new Date('2026-04-26T06:00:00Z');
+  const ogEnd   = new Date('2026-05-03T06:00:00Z');
+  const finalDay = new Date('2026-05-02T06:00:00Z'); // Día de la final
+  const now = new Date();
+  const el = document.getElementById('stats8GDia');
+  if (!el) return;
+  if (now < ogStart) {
+    // Cuenta regresiva
+    const diff = Math.ceil((ogStart - now) / 86400000);
+    el.textContent = diff;
+    el.style.color = 'var(--cyan)';
+    el.style.fontSize = '';
+  } else if (now >= ogStart && now < ogEnd) {
+    const dia = Math.ceil((now - ogStart) / 86400000) || 1;
+    const note8g = document.getElementById('og8Note');
+    // Día 7 = día de la gran final
+    if (now >= finalDay) {
+      el.textContent = '🏆 Final';
+      el.style.color = '#ffd740';
+      el.style.fontSize = '1.1rem';
+      if (note8g) note8g.textContent = '¡Gran Final hoy! 🔥';
+    } else {
+      el.textContent = dia + ' / 7';
+      el.style.color = '#ffd740';
+      el.style.fontSize = '1.4rem';
+      if (note8g) note8g.textContent = 'días en curso 🔥';
+    }
+  } else {
+    // Terminó el torneo
+    el.textContent = '7 / 7';
+    el.style.color = '#00e676';
+    el.style.fontSize = '1.4rem';
+    const note8g = document.getElementById('og8Note');
+    if (note8g) note8g.textContent = '✅ 8G finalizado';
+  }
+}
+
+// ============================================================
+// TABS & ROUTING
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+  // Usar el texto del onclick para identificar la pestaña correcta — sin depender del índice
+  document.querySelectorAll('.tab').forEach(t => {
+    const onclick = t.getAttribute('onclick') || '';
+    const tabName = (onclick.match(/switchTab\('(\w+)'\)/) || [])[1];
+    t.classList.toggle('active', tabName === tab);
+  });
+  const genderTabs = document.getElementById('genderTabs');
+  genderTabs.style.display = ['posiciones','calor','h2h','simulador','bracket','predictor','rachas'].includes(tab) ? 'flex' : 'none';
+  renderContent();
+}
+
+function switchGenero(g) {
+  currentGenero = g;
+  document.querySelectorAll('.gender-tab').forEach((t,i) => t.classList.toggle('active', i === (g==='M'?0:1)));
+  renderContent();
+}
+
+function switchTemporada(t) {
+  currentTemporada = t;
+  // Actualizar label si es necesario
+  renderContent();
+  // Intentar cargar de Supabase con la temporada seleccionada
+  if (typeof loadEquiposFromSupabase === 'function') loadEquiposFromSupabase();
+}
+
+function renderContent() {
+  const data = getEquipos(currentGenero);
+  const c = document.getElementById('mainContent');
+  // Jornadas temporada regular
+  // Varonil: 19 eq × 36 JJ (19×2 - 2 propios = 36 ABE oficial) | Femenil: 16 eq × 30 JJ (ABE oficial) | Femenil: 16 eq × 15 rivales × 2 = 30
+  const totalJornadas = currentGenero === 'M' ? 36 : 28;
+  const jornadaEl = document.getElementById('statsPartidos');
+  const noteEl = document.getElementById('jornadaNote');
+
+  // Regla: si ya empezaron los 8G → temporada regular finalizada
+  const og8Started = new Date() >= new Date('2026-04-26');
+  // También si todos los equipos ya completaron sus partidos esperados
+  const maxPjDatos = Math.max(...data.map(e => e.pj));
+  const temporadaFinalizada = og8Started || maxPjDatos >= totalJornadas;
+
+  if (jornadaEl) {
+    if (temporadaFinalizada) {
+      jornadaEl.textContent = totalJornadas + ' / ' + totalJornadas;
+      jornadaEl.style.color = '#00e676';
+      if (noteEl) noteEl.textContent = '✅ T. Regular finalizada';
+    } else {
+      jornadaEl.textContent = maxPjDatos + ' / ' + totalJornadas;
+      jornadaEl.style.color = 'var(--cyan)';
+      if (noteEl) noteEl.textContent = 'sin contar 8G';
+    }
+  }
+  switch(currentTab) {
+    case 'posiciones': c.innerHTML = renderPosiciones(data); break;
+    case 'calor': c.innerHTML = renderCalor(data); break;
+    case 'h2h': c.innerHTML = isLoggedIn ? renderH2H(data) : renderLock('H2H','Compara dos equipos cara a cara con estadísticas detalladas y radar'); break;
+    case 'simulador': c.innerHTML = isLoggedIn ? renderSimulador(data) : renderLock('Simulador','Simula partidos reales por cuartos basado en estadísticas reales de ABE'); break;
+    case 'analisis': c.innerHTML = isLoggedIn ? renderAnalisis(data) : renderLock('Análisis AI','Análisis táctico profundo con inteligencia artificial usando datos de la ABE'); break;
+    case 'bracket': c.innerHTML = renderBracket(data); break;
+    case 'predictor': c.innerHTML = renderPredictor(data); break;
+    case 'lab': c.innerHTML = renderLab(data); initLab(data); break;
+    case 'momentum':
+      if (!isLoggedIn) { c.innerHTML = renderLockMsg('Momentum','📈','Descubre qué equipos están en racha y cuáles en caída libre'); return; }
+      c.innerHTML = renderMomentum(data); initMomentum(data); break;
+    case 'fanzone':
+      if (!isLoggedIn) { c.innerHTML = renderLockMsg('Fan Zone','🗳️','Vota, predice y compite con otros fans de la ABE'); return; }
+      c.innerHTML = renderFanZone(data); initFanZone(data); break;
+    case 'lab': c.innerHTML = renderLab(data); initLab(data); break;
+    case 'momentum':
+      if (!isLoggedIn) { c.innerHTML = renderLockMsg('Momentum', '📈', 'Descubre qué equipos están en racha y cuáles están en caída libre'); return; }
+      c.innerHTML = renderMomentum(data); initMomentum(data); break;
+    case 'fanzone':
+      if (!isLoggedIn) { c.innerHTML = renderLockMsg('Fan Zone', '🗳️', 'Vota, predice y compite con otros fans de la ABE'); return; }
+      c.innerHTML = renderFanZone(data); initFanZone(data); break;
+    case 'rachas': c.innerHTML = renderRachas(data); break;
+    case 'glosario': c.innerHTML = renderGlosario(); break;
+  }
+  if (currentTab === 'h2h' && isLoggedIn) initH2H(data);
+  if (currentTab === 'simulador' && isLoggedIn) initSim(data);
+  if (currentTab === 'analisis' && isLoggedIn) initAnalisis(data);
+}
+
+// ============================================================
+// LOCK SCREEN
+// ============================================================
+function renderLock(nombre, desc) {
+  return `<div class="lock-screen">
+    <div class="lock-icon-big">🔒</div>
+    <h2>Desbloquea <span>${nombre}</span></h2>
+    <p>${desc}. Crea tu cuenta gratis en segundos para acceder a esta y más funciones premium.</p>
+    <div class="lock-benefits">
+      <div class="lock-benefit"><strong>🎯 H2H</strong>Comparar equipos</div>
+      <div class="lock-benefit"><strong>🎮 Simulador</strong>Simular partidos</div>
+      <div class="lock-benefit"><strong>🧠 Análisis AI</strong>Táctica con Claude</div>
+    </div>
+    <button class="btn-register" onclick="openAuth()">Crear Cuenta Gratis 🚀</button>
+  </div>`;
+}
+
+// ============================================================
+// POSICIONES
+// ============================================================
+function renderPosiciones(data) {
+  const esHistorico = currentTemporada !== '2025-26';
+  const headerTemporada = esHistorico ? `<div style="background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.3);color:#ffd740;padding:8px 16px;border-radius:8px;margin-bottom:12px;font-size:.85rem">📅 Mostrando temporada histórica <strong>${currentTemporada}</strong> — Los datos son de archivo</div>` : '';
+  const confColor = {
+    'Centro':'centro','Norte':'norte','Bajío':'bajio'
+  };
+  const rows = data.map(e => {
+    const dif = e.pf - e.pc;
+    const difStr = dif >= 0 ? `<span class="pos">+${dif}</span>` : `<span class="neg">${dif}</span>`;
+    const conf = e.c;
+    const cls = confColor[conf] || 'co';
+    const rankCls = e.r <= 3 ? `rank rank-${e.r}` : (e.og ? 'rank og' : 'rank');
+    const ogBadge = e.og ? '<span class="badge-og">8G</span>' : '';
+    // Mostrar corona si es campeón confirmado
+    const camp = CAMPEONES[currentTemporada];
+    const campData = camp ? (currentGenero==='M' ? camp.varonil : camp.femenil) : null;
+    const isCampeon = campData && e.n === campData.nombre;
+    const coronaBadge = isCampeon ? '<span style="font-size:.9rem;margin-left:4px" title="Campeón 8G 2026">🏆</span>' : '';
+    return `<tr>
+      <td><span class="${rankCls}">${e.r}</span></td>
+      <td>${e.n}${coronaBadge}${ogBadge}</td>
+      <td><span class="badge-conf ${cls}">${conf}</span></td>
+      <td>${e.pj}</td>
+      <td class="pg">${e.pg}</td>
+      <td class="pp">${e.pp}</td>
+      <td>${difStr}</td>
+    </tr>`;
+  }).join('');
+  return headerTemporada + `<div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Equipo</th><th>Conf</th><th>PJ</th><th>PG</th><th>PP</th><th>+/-</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ============================================================
+// MAPA CALOR
+// ============================================================
+function renderCalor(data) {
+  // Normalizar 0-1 contra toda la liga
+  const norm = (val, arr) => {
+    const mn = Math.min(...arr), mx = Math.max(...arr);
+    if (mx === mn) return 0.5;
+    return Math.max(0, Math.min(1, (val - mn) / (mx - mn)));
+  };
+
+  const ptsPJ   = e => e.pf / e.pj;
+  const pcPJ    = e => e.pc / e.pj;
+  const difPJ   = e => (e.pf - e.pc) / e.pj;
+  const wPct    = e => e.pg / e.pj;
+  const ratio   = e => ptsPJ(e) / pcPJ(e);
+
+  const allPts  = data.map(ptsPJ);
+  const allPc   = data.map(pcPJ);
+  const allDif  = data.map(difPJ);
+  const allWin  = data.map(wPct);
+  const allRat  = data.map(ratio);
+
+  // Score de temperatura: promedio ponderado de 5 métricas (defensiva invertida)
+  const tempScore = e => {
+    const w1 = norm(wPct(e),   allWin) * 0.30;  // 30% victorias
+    const w2 = norm(ptsPJ(e),  allPts) * 0.20;  // 20% ataque
+    const w3 = (1 - norm(pcPJ(e), allPc)) * 0.20; // 20% defensa (invertida)
+    const w4 = norm(difPJ(e),  allDif) * 0.20;  // 20% diferencial
+    const w5 = norm(ratio(e),  allRat) * 0.10;  // 10% ratio PF/PC
+    return Math.round((w1 + w2 + w3 + w4 + w5) * 100);
+  };
+
+  // Calcular scores y ordenar de más caliente a más frío
+  const withScore = data.map(e => ({ ...e, temp: tempScore(e) }))
+                        .sort((a, b) => b.temp - a.temp);
+
+  const maxT = withScore[0].temp;
+  const minT = withScore[withScore.length - 1].temp;
+
+  // Color de temperatura según score (0-100)
+  const tempColor = (t) => {
+    if (t >= 80) return '#ef5350';      // rojo fuego
+    if (t >= 65) return '#ff7043';      // naranja caliente
+    if (t >= 55) return '#ffa726';      // naranja
+    if (t >= 45) return '#ffee58';      // amarillo
+    if (t >= 35) return '#66bb6a';      // verde
+    if (t >= 25) return '#26a69a';      // verde azulado
+    if (t >= 15) return '#0288d1';      // azul claro
+    return '#1565c0';                   // azul frío
+  };
+
+  const tempEmoji = (t) => {
+    if (t >= 75) return '🔥';
+    if (t >= 55) return '♨️';
+    if (t >= 40) return '🌤️';
+    if (t >= 25) return '❄️';
+    return '🧊';
+  };
+
+  const hotTeam  = withScore[0];
+  const coldTeam = withScore[withScore.length - 1];
+
+  // Filas de la tabla
+  const rows = withScore.map((e, i) => {
+    const t = e.temp;
+    const color = tempColor(t);
+    const barW = Math.max(4, Math.round((t / 100) * 100));
+    const aWin = norm(wPct(e), allWin);
+    const aPts = norm(ptsPJ(e), allPts);
+    const aDef = 1 - norm(pcPJ(e), allPc);
+    const aDif = norm(difPJ(e), allDif);
+
+    const miniCell = (v, invert=false) => {
+      const pct = Math.round((invert ? 1-v : v) * 100);
+      const c = v >= .66 ? '#00e676' : v >= .33 ? '#ffd740' : '#ff5252';
+      return `<td class="poder-cell" style="color:${invert&&v<.5?'#00e676':invert&&v>.66?'#ff5252':c}">${(invert? pcPJ(e) : ptsPJ(e) ).toFixed !== undefined ? '' : ''}</td>`;
+    };
+
+    // Posición con medalla para top 3
+    const rankDisplay = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+
+    return `<tr>
+      <td style="text-align:center;font-size:${i<3?'.95':'0.75'}rem;width:32px">${rankDisplay}</td>
+      <td>
+        <span class="poder-team-name">${e.n}</span>
+        ${e.og ? '<span class="poder-og-badge">8G</span>' : ''}
+      </td>
+      <td class="poder-cell" style="color:${wPct(e)>=.7?'#00e676':wPct(e)>=.5?'#ffd740':'#ff5252'}">${Math.round(wPct(e)*100)}%</td>
+      <td class="poder-cell" style="color:${ptsPJ(e)>=85?'#00e676':ptsPJ(e)>=70?'#ffd740':'#ff5252'}">${ptsPJ(e).toFixed(1)}</td>
+      <td class="poder-cell" style="color:${pcPJ(e)<=75?'#00e676':pcPJ(e)<=85?'#ffd740':'#ff5252'}">${pcPJ(e).toFixed(1)}</td>
+      <td class="poder-cell" style="color:${difPJ(e)>=5?'#00e676':difPJ(e)>=0?'#ffd740':'#ff5252'}">${difPJ(e)>0?'+':''}${difPJ(e).toFixed(1)}</td>
+      <td>
+        <div class="poder-thermo-wrap">
+          <div class="poder-thermo" style="width:${barW}px;background:${color}"></div>
+        </div>
+      </td>
+      <td class="poder-score-cell">
+        <span class="poder-score-pill" style="background:${color}22;color:${color};border:1px solid ${color}55">
+          ${tempEmoji(t)} ${t}
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="poder-header">
+      <div>
+        <div style="font-size:1.05rem;font-weight:800">🌡️ Mapa de Poder <span style="color:var(--gold)">ABE 2025-26</span></div>
+        <div style="font-size:.7rem;color:var(--text2);margin-top:3px">Score 0-100 basado en victorias, ataque, defensa y diferencial · Todos los equipos</div>
+      </div>
+      <div class="poder-legend">
+        <span>🧊 Frío</span>
+        <div class="poder-legend-bar"></div>
+        <span>🔥 Caliente</span>
+      </div>
+    </div>
+
+    <div class="poder-extremos">
+      <div class="poder-extremo hot">
+        <div class="poder-extremo-emoji">🔥</div>
+        <div class="poder-extremo-info">
+          <div class="poder-extremo-label">Equipo más caliente</div>
+          <div class="poder-extremo-name">${hotTeam.n}</div>
+          <div style="font-size:.7rem;color:#ef9a9a;margin-top:2px">${Math.round(wPct(hotTeam)*100)}%G · ${ptsPJ(hotTeam).toFixed(1)} PF/J · ${difPJ(hotTeam)>0?'+':''}${difPJ(hotTeam).toFixed(1)}/J</div>
+        </div>
+        <div class="poder-extremo-score">${hotTeam.temp}</div>
+      </div>
+      <div class="poder-extremo cold">
+        <div class="poder-extremo-emoji">🧊</div>
+        <div class="poder-extremo-info">
+          <div class="poder-extremo-label">Equipo más frío</div>
+          <div class="poder-extremo-name">${coldTeam.n}</div>
+          <div style="font-size:.7rem;color:#90caf9;margin-top:2px">${Math.round(wPct(coldTeam)*100)}%G · ${ptsPJ(coldTeam).toFixed(1)} PF/J · ${difPJ(coldTeam)>0?'+':''}${difPJ(coldTeam).toFixed(1)}/J</div>
+        </div>
+        <div class="poder-extremo-score">${coldTeam.temp}</div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table class="poder-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Equipo</th>
+            <th title="Porcentaje de victorias">%G</th>
+            <th title="Puntos a favor por juego">PF/J</th>
+            <th title="Puntos en contra por juego">PC/J</th>
+            <th title="Diferencial por juego">+/-/J</th>
+            <th style="min-width:80px" title="Temperatura relativa en la liga">Temperatura</th>
+            <th title="Score de poder 0-100">Score</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="font-size:.62rem;color:var(--text2);margin-top:10px;text-align:center">
+      Score = 30% victorias + 20% ataque + 20% defensa + 20% diferencial + 10% ratio PF/PC · Normalizado vs. toda la liga
+    </div>`;
+}
+
+
+// ============================================================
+// H2H
+// ============================================================
+function renderH2H(data) {
+  const opts = data.map((e,i) => `<option value="${i}">${e.r}. ${e.n}</option>`).join('');
+  return `<div class="h2h-selectors">
+    <select class="h2h-select" id="h2hA" onchange="updateH2H()">${opts}</select>
+    <div class="vs-badge">VS</div>
+    <select class="h2h-select" id="h2hB" onchange="updateH2H()">${data.map((e,i)=>`<option value="${i}" ${i===1?'selected':''}>${e.r}. ${e.n}</option>`).join('')}</select>
+  </div>
+  <div class="h2h-grid" id="h2hGrid"></div>`;
+}
+
+function initH2H(data) { updateH2H(); }
+
+function updateH2H() {
+  const data = getEquipos(currentGenero);
+  const iA = parseInt(document.getElementById('h2hA')?.value||0);
+  const iB = parseInt(document.getElementById('h2hB')?.value||1);
+  const a = data[iA], b = data[iB];
+
+  // ── Métricas calculadas de datos reales ABE ───────────────
+  const ptsPorJ  = e => e.pf / e.pj;           // PF/J  — pts anotados por juego
+  const pcPorJ   = e => e.pc / e.pj;           // PC/J  — pts concedidos por juego
+  const winPct   = e => e.pg / e.pj;           // %G    — % victorias
+  const difPorJ  = e => (e.pf - e.pc) / e.pj; // +/-/J — diferencial por juego
+  const consist  = e => e.pg / e.pj;           // igual a winPct, eje independiente
+  const ratioOfe = e => ptsPorJ(e) / pcPorJ(e);// ratio PF/PC — eficiencia neta
+  const difTotal = e => e.pf - e.pc;           // diferencial acumulado temporada
+
+  // Normalizar contra TODOS los equipos de la liga (0=peor, 1=mejor)
+  const norm = (val, allVals) => {
+    const mn = Math.min(...allVals), mx = Math.max(...allVals);
+    if (mx === mn) return 0.5;
+    return Math.max(0, Math.min(1, (val - mn) / (mx - mn)));
+  };
+  // Normalización invertida (menos = mejor, ej. puntos concedidos)
+  const normInv = (val, allVals) => 1 - norm(val, allVals);
+
+  const allPts  = data.map(ptsPorJ);
+  const allPc   = data.map(pcPorJ);
+  const allWin  = data.map(winPct);
+  const allDif  = data.map(difPorJ);
+  const allRatio= data.map(ratioOfe);
+  const allDifT = data.map(difTotal);
+
+  // 8 ejes del radar — 4 Ofensivos (naranja) + 4 Defensivos (verde)
+  // label     = título en el radar
+  // short     = título corto para tabla inferior
+  // unit      = unidad para la tabla
+  // group     = 'O' ofensivo | 'D' defensivo
+  // groupA/B  = valor normalizado 0-1 para el radar
+  // rawA/B    = valor real del equipo para mostrar
+  const axes = [
+    {
+      label:'PF/J', short:'Pts anotados/J', unit:'pts',
+      groupA: norm(ptsPorJ(a), allPts),
+      groupB: norm(ptsPorJ(b), allPts),
+      rawA: ptsPorJ(a).toFixed(1), rawB: ptsPorJ(b).toFixed(1),
+      numA: ptsPorJ(a), numB: ptsPorJ(b),
+      betterHigh: true, group:'O'
+    },
+    {
+      label:'% Victorias', short:'% Ganados', unit:'',
+      groupA: norm(winPct(a), allWin),
+      groupB: norm(winPct(b), allWin),
+      rawA: (winPct(a)*100).toFixed(0)+'%', rawB: (winPct(b)*100).toFixed(0)+'%',
+      numA: winPct(a), numB: winPct(b),
+      betterHigh: true, group:'O'
+    },
+    {
+      label:'+/- /J', short:'Diferencial/J', unit:'pts',
+      groupA: norm(difPorJ(a), allDif),
+      groupB: norm(difPorJ(b), allDif),
+      rawA: (difPorJ(a)>0?'+':'')+difPorJ(a).toFixed(1),
+      rawB: (difPorJ(b)>0?'+':'')+difPorJ(b).toFixed(1),
+      numA: difPorJ(a), numB: difPorJ(b),
+      betterHigh: true, group:'O'
+    },
+    {
+      label:'Ratio PF/PC', short:'Ratio PF/PC', unit:'',
+      groupA: norm(ratioOfe(a), allRatio),
+      groupB: norm(ratioOfe(b), allRatio),
+      rawA: ratioOfe(a).toFixed(2), rawB: ratioOfe(b).toFixed(2),
+      numA: ratioOfe(a), numB: ratioOfe(b),
+      betterHigh: true, group:'O'
+    },
+    {
+      label:'PC/J', short:'Pts concedidos/J', unit:'pts',
+      groupA: normInv(pcPorJ(a), allPc),
+      groupB: normInv(pcPorJ(b), allPc),
+      rawA: pcPorJ(a).toFixed(1), rawB: pcPorJ(b).toFixed(1),
+      numA: pcPorJ(a), numB: pcPorJ(b),
+      betterHigh: false, group:'D'  // menos = mejor defensa
+    },
+    {
+      label:'Record', short:'Record', unit:'',
+      groupA: norm(winPct(a), allWin),
+      groupB: norm(winPct(b), allWin),
+      rawA: a.pg+'G-'+a.pp+'P', rawB: b.pg+'G-'+b.pp+'P',
+      numA: a.pg, numB: b.pg,
+      betterHigh: true, group:'D'
+    },
+    {
+      label:'Dif.Total', short:'Dif. acumulado', unit:'pts',
+      groupA: norm(difTotal(a), allDifT),
+      groupB: norm(difTotal(b), allDifT),
+      rawA: (difTotal(a)>0?'+':'')+difTotal(a),
+      rawB: (difTotal(b)>0?'+':'')+difTotal(b),
+      numA: difTotal(a), numB: difTotal(b),
+      betterHigh: true, group:'D'
+    },
+    {
+      label:'Ef.Def', short:'Ef. defensiva', unit:'%',
+      groupA: normInv(pcPorJ(a)/ptsPorJ(a), data.map(e=>pcPorJ(e)/ptsPorJ(e))),
+      groupB: normInv(pcPorJ(b)/ptsPorJ(b), data.map(e=>pcPorJ(e)/ptsPorJ(e))),
+      rawA: (pcPorJ(a)/ptsPorJ(a)*100).toFixed(0)+'%',
+      rawB: (pcPorJ(b)/ptsPorJ(b)*100).toFixed(0)+'%',
+      numA: pcPorJ(a)/ptsPorJ(a), numB: pcPorJ(b)/ptsPorJ(b),
+      betterHigh: false, group:'D'
+    },
+  ];
+
+  // ── Score global (promedio de los 8 ejes normalizados, vs. liga) ──
+  const scoreA = Math.round(axes.reduce((s,ax)=>s+ax.groupA,0)/axes.length*100);
+  const scoreB = Math.round(axes.reduce((s,ax)=>s+ax.groupB,0)/axes.length*100);
+
+  // ── Barras de comparación ─────────────────────────────────
+  // Usamos valores absolutos reales, la barra muestra proporción visual real
+  const barDefs = [
+    {l:'PF/J — pts anotados', va:ptsPorJ(a), vb:ptsPorJ(b), fmt:v=>v.toFixed(1), betterHigh:true},
+    {l:'PC/J — pts concedidos',va:pcPorJ(a),  vb:pcPorJ(b),  fmt:v=>v.toFixed(1), betterHigh:false},
+    {l:'JG — victorias',      va:a.pg,        vb:b.pg,        fmt:v=>v,            betterHigh:true},
+    {l:'+/- por juego',       va:difPorJ(a),  vb:difPorJ(b),  fmt:v=>(v>0?'+':'')+v.toFixed(1), betterHigh:true},
+    {l:'Ratio PF/PC',         va:ratioOfe(a), vb:ratioOfe(b), fmt:v=>v.toFixed(2), betterHigh:true},
+  ];
+
+  const bars = barDefs.map(s => {
+    const va = s.va, vb = s.vb;
+    // Para la barra: escala basada en máximo de la LIGA (no solo entre los 2)
+    const allVs = data.map(e => {
+      if (s.l.includes('PF/J')) return ptsPorJ(e);
+      if (s.l.includes('PC/J')) return pcPorJ(e);
+      if (s.l.includes('victorias')) return e.pg;
+      if (s.l.includes('+/-')) return difPorJ(e);
+      return ratioOfe(e);
+    });
+    const mn = Math.min(...allVs), mx = Math.max(...allVs);
+    const rng = mx - mn || 1;
+    const pctA = Math.round(((va-mn)/rng)*85+5);
+    const pctB = Math.round(((vb-mn)/rng)*85+5);
+    const aWins = s.betterHigh ? va >= vb : va <= vb;
+    const bWins = s.betterHigh ? vb > va  : vb < va;
+    const colorA = aWins ? '#00e676' : '#ff5252';
+    const colorB = bWins ? '#00e676' : '#ff5252';
+    return `<div class="h2h-bar-row" style="margin-bottom:10px">
+      <div class="val a" style="color:${colorA};min-width:44px;text-align:right">${s.fmt(va)}</div>
+      <div style="flex:1;padding:0 10px">
+        <div style="font-size:.72rem;color:#8896b3;text-align:center;margin-bottom:4px">${s.l}</div>
+        <div style="height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pctA}%;background:#00e5ff;border-radius:4px;opacity:.85"></div>
+        </div>
+        <div style="height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative;margin-top:3px">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pctB}%;background:#ff80ab;border-radius:4px;opacity:.85"></div>
+        </div>
+      </div>
+      <div class="val b" style="color:${colorB};min-width:44px">${s.fmt(vb)}</div>
+    </div>`;
+  }).join('');
+
+  // ── Radar SVG de 8 ejes ───────────────────────────────────
+  const cx=170, cy=170, r=115;
+  const N = axes.length;
+  const angles = axes.map((_,i) => (i/N)*Math.PI*2 - Math.PI/2);
+  const clamp = v => Math.min(1, Math.max(0, v||0));
+
+  const polyPts = vals => angles.map((ang,i) =>
+    `${cx + clamp(vals[i])*r*Math.cos(ang)},${cy + clamp(vals[i])*r*Math.sin(ang)}`
+  ).join(' ');
+
+  // Grid concéntrico
+  const grids = [.25,.5,.75,1].map(lv =>
+    `<polygon points="${angles.map(a=>`${cx+lv*r*Math.cos(a)},${cy+lv*r*Math.sin(a)}`).join(' ')}"
+      fill="none" stroke="#1e2d4a" stroke-width="${lv===1?1.5:0.7}" stroke-dasharray="${lv<1?'4,3':''}" />`
+  ).join('');
+
+  // Líneas de eje
+  const axisLines = angles.map(a =>
+    `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="#243048" stroke-width="1.2"/>`
+  ).join('');
+
+  // Áreas rellenas — cyan para A, rosa para B (igual que siempre)
+  const polyA = `<polygon points="${polyPts(axes.map(ax=>ax.groupA))}" fill="rgba(0,229,255,.15)" stroke="#00e5ff" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const polyB = `<polygon points="${polyPts(axes.map(ax=>ax.groupB))}" fill="rgba(255,128,171,.15)" stroke="#ff80ab" stroke-width="2.5" stroke-linejoin="round"/>`;
+
+  // Puntos en vértices
+  const dotsA = angles.map((ang,i) => {
+    const v = clamp(axes[i].groupA);
+    return `<circle cx="${cx+v*r*Math.cos(ang)}" cy="${cy+v*r*Math.sin(ang)}" r="4" fill="#00e5ff" stroke="#080c18" stroke-width="1.5"/>`;
+  }).join('');
+  const dotsB = angles.map((ang,i) => {
+    const v = clamp(axes[i].groupB);
+    return `<circle cx="${cx+v*r*Math.cos(ang)}" cy="${cy+v*r*Math.sin(ang)}" r="4" fill="#ff80ab" stroke="#080c18" stroke-width="1.5"/>`;
+  }).join('');
+
+  // Etiquetas — NARANJA para ofensivos, VERDE para defensivos (diferente a cyan/rosa de equipos)
+  const labelsEl = axes.map((ax,i) => {
+    const ang = angles[i];
+    const lx = cx + (r+24)*Math.cos(ang);
+    const ly = cy + (r+24)*Math.sin(ang);
+    const anchor = Math.cos(ang) > 0.25 ? 'start' : Math.cos(ang) < -0.25 ? 'end' : 'middle';
+    const color = ax.group==='O' ? '#ffb74d' : '#69f0ae'; // naranja ofensivo, verde defensivo
+    return `<text x="${lx}" y="${ly}" fill="${color}" font-size="10" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">${ax.label}</text>`;
+  }).join('');
+
+  // Marca de % en el grid
+  const gridLabels = [25,50,75].map(pct => {
+    const ly = cy - (pct/100)*r - 4;
+    return `<text x="${cx}" y="${ly}" fill="#3a4a5a" font-size="8" text-anchor="middle">${pct}%</text>`;
+  }).join('');
+
+  // Etiqueta central
+  const centerLabel = `<text x="${cx}" y="${cy+2}" fill="#4a5a6a" font-size="9" text-anchor="middle" dominant-baseline="middle">vs liga</text>`;
+
+  const radar = `<svg viewBox="0 0 340 340" style="width:100%;max-width:340px">
+    ${grids}${axisLines}${polyA}${polyB}${dotsA}${dotsB}${labelsEl}${gridLabels}${centerLabel}
+  </svg>`;
+
+  // ── Tabla inferior: 8 métricas con valores reales ─────────
+  const metricRows = axes.map(ax => {
+    const aWins = ax.betterHigh ? (ax.numA !== undefined ? ax.numA : parseFloat(ax.rawA)) >= (ax.numB !== undefined ? ax.numB : parseFloat(ax.rawB))
+                                : (ax.numA !== undefined ? ax.numA : parseFloat(ax.rawA)) <= (ax.numB !== undefined ? ax.numB : parseFloat(ax.rawB));
+    const bWins = ax.betterHigh ? (ax.numB !== undefined ? ax.numB : parseFloat(ax.rawB)) > (ax.numA !== undefined ? ax.numA : parseFloat(ax.rawA))
+                                : (ax.numB !== undefined ? ax.numB : parseFloat(ax.rawB)) < (ax.numA !== undefined ? ax.numA : parseFloat(ax.rawA));
+    const cA = aWins ? '#00e676' : '#ff5252';
+    const cB = bWins ? '#00e676' : '#ff5252';
+    const dot = ax.group==='O' ? '🟠' : '🟢';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:.72rem;background:var(--bg3);border-radius:6px;padding:5px 10px">
+      <span style="color:${cA};font-weight:700;min-width:48px">${ax.rawA}</span>
+      <span style="color:#8896b3;flex:1;text-align:center">${dot} ${ax.short}</span>
+      <span style="color:${cB};font-weight:700;min-width:48px;text-align:right">${ax.rawB}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('h2hGrid').innerHTML = `
+    <!-- Score global -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px">
+      <div style="text-align:center">
+        <div style="color:#00e5ff;font-weight:800;font-size:1rem;margin-bottom:2px">${a.n}</div>
+        <div style="color:#ffd740;font-size:1.8rem;font-weight:900;line-height:1">${scoreA}</div>
+        <div style="font-size:.62rem;color:#8896b3;margin-top:2px">score / 100</div>
+      </div>
+      <div style="text-align:center;padding:0 8px">
+        <div style="color:#8896b3;font-size:1.2rem;font-weight:700">VS</div>
+        <div style="font-size:.6rem;color:#4a5a6a;margin-top:4px;line-height:1.3">Promedio de<br>8 métricas<br>vs. toda la liga</div>
+      </div>
+      <div style="text-align:center">
+        <div style="color:#ff80ab;font-weight:800;font-size:1rem;margin-bottom:2px">${b.n}</div>
+        <div style="color:#ffd740;font-size:1.8rem;font-weight:900;line-height:1">${scoreB}</div>
+        <div style="font-size:.62rem;color:#8896b3;margin-top:2px">score / 100</div>
+      </div>
+    </div>
+
+    <!-- Barras comparativas -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:#00e5ff;font-size:.78rem;font-weight:700">◀ ${a.n}</span>
+        <span style="color:#8896b3;font-size:.72rem">Estadísticas clave</span>
+        <span style="color:#ff80ab;font-size:.78rem;font-weight:700">${b.n} ▶</span>
+      </div>
+      ${bars}
+      <div style="font-size:.62rem;color:#3a4a5a;text-align:center;margin-top:6px">Barra = posición relativa dentro de la liga · 🟢 mejor en esa categoría</div>
+    </div>
+
+    <!-- Radar -->
+    <div class="radar-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:6px">
+        <span style="font-size:.72rem;color:#8896b3">Perfil de rendimiento — 8 métricas reales</span>
+        <div style="display:flex;gap:10px;font-size:.68rem">
+          <span style="color:#ffb74d">● Ofensivo</span>
+          <span style="color:#69f0ae">● Defensivo</span>
+        </div>
+      </div>
+      ${radar}
+      <div style="display:flex;gap:20px;justify-content:center;margin-top:6px;font-size:.8rem">
+        <span style="color:#00e5ff;font-weight:700">▬ ${a.n}</span>
+        <span style="color:#ff80ab;font-weight:700">▬ ${b.n}</span>
+      </div>
+      <!-- Tabla de 8 métricas -->
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:4px;width:100%">
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#4a5a6a;padding:0 10px;margin-bottom:2px">
+          <span style="color:#00e5ff">${a.n}</span>
+          <span>métrica</span>
+          <span style="color:#ff80ab">${b.n}</span>
+        </div>
+        ${metricRows}
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// SIMULADOR
+// ============================================================
+function renderSimulador(data) {
+  const opts = data.map((e,i) => `<option value="${i}">${e.r}. ${e.n} (${e.pg}G-${e.pp}P)</option>`).join('');
+  return `<div class="sim-selectors">
+    <select class="h2h-select" id="simLocal">${opts}</select>
+    <div class="vs-badge">VS</div>
+    <select class="h2h-select" id="simVis">${data.map((e,i)=>`<option value="${i}" ${i===1?'selected':''}>${e.r}. ${e.n} (${e.pg}G-${e.pp}P)</option>`).join('')}</select>
+  </div>
+  <button class="sim-btn" onclick="simular()">🏀 Simular Partido</button>
+  <div id="simResult"></div>`;
+}
+
+function initSim(data) {}
+
+function simular() {
+  const data = getEquipos(currentGenero);
+  const iL = parseInt(document.getElementById('simLocal')?.value||0);
+  const iV = parseInt(document.getElementById('simVis')?.value||1);
+  const local = data[iL], vis = data[iV];
+
+  // Pts/jgo reales de cada equipo
+  const base_l = local.pf / local.pj;
+  const base_v = vis.pf / vis.pj;
+
+  // Eficiencia defensiva: cuántos puntos concede por juego (normalizado)
+  // Un equipo que concede pocos puntos reduce los puntos del rival
+  const avgPC = data.reduce((s,e)=>s+e.pc/e.pj,0)/data.length; // promedio liga
+  const def_l = avgPC / (local.pc / local.pj); // > 1 = mejor defensa
+  const def_v = avgPC / (vis.pc / vis.pj);
+
+  // Ventaja local: +3% en promedio de puntos
+  const ventajaLocal = 1.03;
+
+  // Simular por cuartos con variabilidad realista (±12%)
+  const quarters = Array(4).fill(0).map(() => {
+    // Local: sus puntos/jgo * factor defensivo visitante * ventaja local * ruido
+    const ql = Math.round((base_l/4) * def_v * ventajaLocal * (0.88 + Math.random()*0.24));
+    // Visitante: sus puntos/jgo * factor defensivo local * ruido
+    const qv = Math.round((base_v/4) * def_l * (0.88 + Math.random()*0.24));
+    return {l: Math.max(12, ql), v: Math.max(11, qv)}; // mínimo 12 pts por cuarto
+  });
+
+  let totL = quarters.reduce((s,q)=>s+q.l,0);
+  let totV = quarters.reduce((s,q)=>s+q.v,0);
+
+  // TIEMPO EXTRA: si hay empate, jugar periodos de 5 min hasta definir
+  let otPeriods = [];
+  let otCount = 0;
+  while (totL === totV && otCount < 3) {
+    otCount++;
+    // OT: ~5 pts por equipo (periodo corto de 5 min)
+    const otL = Math.round((base_l/4) * 0.35 * def_v * ventajaLocal * (0.8 + Math.random()*0.4));
+    const otV = Math.round((base_v/4) * 0.35 * def_l * (0.8 + Math.random()*0.4));
+    // Asegurar que no queden iguales en OT (al menos 1 de diferencia)
+    const otLf = Math.max(4, otL);
+    const otVf = otL === otV ? Math.max(4, otV + (Math.random()>0.5?1:-1)) : Math.max(4, otV);
+    otPeriods.push({l: otLf, v: otVf});
+    totL += otLf; totV += otVf;
+  }
+  // Último recurso: si siguen iguales después de 3 OT, diferencia aleatoria de 1-3
+  if (totL === totV) { totL += Math.floor(Math.random()*3)+1; }
+
+  const mvpTeam = totL > totV ? local : vis;
+  const winner = totL > totV ? local.n : vis.n;
+
+  // MVP: datos estadísticos del equipo ganador
+  const mvpPts  = Math.round((totL > totV ? totL : totV) * (0.25 + Math.random()*0.08));
+  const mvpReb  = Math.round(3 + Math.random() * 9);
+  const mvpAst  = Math.round(1 + Math.random() * 7);
+  const mvpTeamName = mvpTeam.n;
+  document.getElementById('simResult').innerHTML = `
+    <div class="quarters-grid">
+      ${quarters.map((q,i)=>`<div class="quarter-card">
+        <div class="quarter-label">Q${i+1}</div>
+        <div class="quarter-score" style="color:#00e5ff">${q.l} - <span style="color:#ff80ab">${q.v}</span></div>
+      </div>`).join('')}
+      ${otPeriods.map((q,i)=>`<div class="quarter-card" style="border-color:#ffd74060;background:rgba(255,215,64,.08)">
+        <div class="quarter-label" style="color:#ffd740">OT${otPeriods.length>1?i+1:''}</div>
+        <div class="quarter-score" style="color:#00e5ff">${q.l} - <span style="color:#ff80ab">${q.v}</span></div>
+      </div>`).join('')}
+    </div>
+    <div class="final-score">
+      <div class="final-teams">
+        <div><div class="final-team" style="color:#00e5ff">${local.n}</div>
+        <div class="final-pts ${totL>totV?'winner':''}">${totL}</div></div>
+        <div style="text-align:center"><div style="color:#8896b3;font-size:1.5rem;font-weight:700">VS</div>${otPeriods.length>0?`<div style="color:#ffd740;font-size:.72rem;font-weight:800;margin-top:4px">🏀 ${otPeriods.length===1?'TIEMPO EXTRA':otPeriods.length+'x OVERTIME'}</div>`:''}</div>
+        <div><div class="final-team" style="color:#ff80ab">${vis.n}</div>
+        <div class="final-pts ${totV>totL?'winner':''}">${totV}</div></div>
+      </div>
+    </div>
+    <div class="mvp-card">
+      <div class="mvp-label">⭐ MVP ESTIMADO — ${mvpTeamName}</div>
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:8px">
+        <div style="text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:#ffd740">${mvpPts}</div>
+          <div style="font-size:.7rem;color:#8896b3">PTS</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:#00e5ff">${mvpReb}</div>
+          <div style="font-size:.7rem;color:#8896b3">REB</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.8rem;font-weight:900;color:#00e676">${mvpAst}</div>
+          <div style="font-size:.7rem;color:#8896b3">AST</div>
+        </div>
+      </div>
+      <div style="font-size:.65rem;color:#5a6a7a;margin-top:8px;font-style:italic">* Stats estimadas del equipo ganador</div>
+    </div>
+    </div>`;
+}
+
+// ============================================================
+// ANÁLISIS AI
+// ============================================================
+function renderAnalisis(data) {
+  const opts = data.map((e,i)=>`<option value="${i}">${e.r}. ${e.n}</option>`).join('');
+  return `<div class="ai-selector">
+    <select class="h2h-select" id="aiEquipo" style="margin-bottom:12px">${opts}</select>
+    <button class="ai-btn" onclick="analizarEquipo()">🧠 Analizar con IA</button>
+  </div>
+  <div class="ai-response" id="aiResponse">
+    <p style="color:#8896b3;font-size:.9rem">Selecciona un equipo y presiona "Analizar con IA" para obtener un análisis táctico detallado basado en los datos reales de la Liga ABE 2025-26.</p>
+  </div>`;
+}
+
+function initAnalisis(data) {}
+
+async function analizarEquipo() {
+  const data = getEquipos(currentGenero);
+  const idx = parseInt(document.getElementById('aiEquipo')?.value||0);
+  const eq = data[idx];
+  const genLabel = currentGenero === 'M' ? 'varonil' : 'femenil';
+  document.getElementById('aiResponse').innerHTML = `<div class="ai-loading"><div class="spinner"></div><span>Analizando ${eq.n} con IA...</span></div>`;
+  
+  const prompt = `Eres un analista experto de basquetbol universitario mexicano. Analiza al equipo ${eq.n} de la Liga ABE División I rama ${genLabel}, temporada 2025-26.
+
+Datos reales del equipo:
+- Posición: #${eq.r} de ${data.length}
+- Record: ${eq.pg}G - ${eq.pp}P (${eq.pj} jugados)
+- Puntos a favor: ${eq.pf} total (${(eq.pf/eq.pj).toFixed(1)} por juego)
+- Puntos en contra: ${eq.pc} total (${(eq.pc/eq.pj).toFixed(1)} por juego)
+- Diferencial: ${eq.pf-eq.pc > 0 ? '+':''}${eq.pf-eq.pc}
+- Clasificado al Ocho Grandes: ${eq.og ? 'SÍ' : 'NO'}
+
+Proporciona un análisis táctico detallado en español que incluya: fortalezas ofensivas, análisis defensivo, estilo de juego probable, y perspectiva para el Ocho Grandes 2026. Sé específico y usa los datos reales. Máximo 250 palabras.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const d = await res.json();
+    const text = d.content?.[0]?.text || 'No se pudo obtener el análisis.';
+    document.getElementById('aiResponse').innerHTML = `<div class="ai-text">${text}</div>`;
+  } catch(e) {
+    document.getElementById('aiResponse').innerHTML = `<div class="ai-text" style="color:#ff5252">Error al conectar con el análisis IA. Verifica tu conexión e intenta de nuevo.</div>`;
+  }
+}
+
+// ============================================================
+// BRACKET
+// ============================================================
+function renderBracket(data) {
+  const og = data.filter(e => e.og).slice(0,8);
+  const gen = currentGenero === 'M' ? 'V' : 'F';
+  const KEY = `bracket_${gen}`;
+
+  // Cargar estado guardado
+  let state;
+  try { state = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) { state = null; }
+  if (!state || state.seeds.length !== 8) {
+    state = {
+      seeds: og.map(e => e.n),
+      qf: [{a:null,b:null,sa:null,sb:null},{a:null,b:null,sa:null,sb:null},{a:null,b:null,sa:null,sb:null},{a:null,b:null,sa:null,sb:null}],
+      sf: [{a:null,b:null,sa:null,sb:null},{a:null,b:null,sa:null,sb:null}],
+      fi: {a:null,b:null,sa:null,sb:null},
+      champ: null
+    };
+    // Matchups estándar 8G: 1v8, 4v5, 3v6, 2v7
+    state.qf[0] = {a:og[0]?.n,b:og[7]?.n,sa:null,sb:null};
+    state.qf[1] = {a:og[3]?.n,b:og[4]?.n,sa:null,sb:null};
+    state.qf[2] = {a:og[2]?.n,b:og[5]?.n,sa:null,sb:null};
+    state.qf[3] = {a:og[1]?.n,b:og[6]?.n,sa:null,sb:null};
+  }
+
+  function saveState() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
+  }
+
+  function ganador(matchup) {
+    if (matchup.sa !== null && matchup.sb !== null && matchup.a && matchup.b) {
+      if (matchup.sa > matchup.sb) return matchup.a;
+      if (matchup.sb > matchup.sa) return matchup.b;
+    }
+    return null;
+  }
+
+  function matchHTML(matchup, id, label) {
+    const w = ganador(matchup);
+    const aWin = w === matchup.a;
+    const bWin = w === matchup.b;
+    return `<div class="bracket-match" id="match-${id}">
+      <div class="match-label">${label}</div>
+      <div class="match-team ${aWin?'winner':''} ${!matchup.a?'tbd':''}">
+        <span class="team-name">${matchup.a || 'Por definir'}</span>
+        <input type="number" min="0" max="999" placeholder="-"
+          value="${matchup.sa !== null ? matchup.sa : ''}"
+          onchange="updateScore('${id}','a',this.value)"
+          class="score-input" ${!matchup.a||!matchup.b?'disabled':''}>
+      </div>
+      <div class="match-team ${bWin?'winner':''} ${!matchup.b?'tbd':''}">
+        <span class="team-name">${matchup.b || 'Por definir'}</span>
+        <input type="number" min="0" max="999" placeholder="-"
+          value="${matchup.sb !== null ? matchup.sb : ''}"
+          onchange="updateScore('${id}','b',this.value)"
+          class="score-input" ${!matchup.a||!matchup.b?'disabled':''}>
+      </div>
+      ${w ? `<div class="match-winner">✅ ${w}</div>` : ''}
+    </div>`;
+  }
+
+  window.updateScore = function(id, side, val) {
+    const v = val === '' ? null : parseInt(val);
+    const parts = id.split('-');
+    const round = parts[0];
+    const idx = parseInt(parts[1]);
+    if (round === 'qf') {
+      state.qf[idx][side === 'a' ? 'sa' : 'sb'] = v;
+      // Actualizar semis
+      const w0 = ganador(state.qf[0]), w1 = ganador(state.qf[1]);
+      const w2 = ganador(state.qf[2]), w3 = ganador(state.qf[3]);
+      state.sf[0].a = w0; state.sf[0].b = w1;
+      state.sf[1].a = w2; state.sf[1].b = w3;
+      // Resetear scores de semis y final si cambia el equipo
+      state.sf[0].sa = null; state.sf[0].sb = null;
+      state.sf[1].sa = null; state.sf[1].sb = null;
+      state.fi.a = null; state.fi.b = null; state.fi.sa = null; state.fi.sb = null;
+      state.champ = null;
+    } else if (round === 'sf') {
+      state.sf[idx][side === 'a' ? 'sa' : 'sb'] = v;
+      const w0 = ganador(state.sf[0]), w1 = ganador(state.sf[1]);
+      state.fi.a = w0; state.fi.b = w1;
+      state.fi.sa = null; state.fi.sb = null;
+      state.champ = null;
+    } else if (round === 'fi') {
+      state.fi[side === 'a' ? 'sa' : 'sb'] = v;
+      state.champ = ganador(state.fi);
+    }
+    saveState();
+    // Re-render bracket
+    document.getElementById('mainContent').innerHTML = renderBracket(data);
+  };
+
+  window.resetBracket = function() {
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    document.getElementById('mainContent').innerHTML = renderBracket(data);
+  };
+
+  // Sincronizar semis y final con ganadores actuales
+  const w0 = ganador(state.qf[0]), w1 = ganador(state.qf[1]);
+  const w2 = ganador(state.qf[2]), w3 = ganador(state.qf[3]);
+  if (!state.sf[0].a) state.sf[0].a = w0;
+  if (!state.sf[0].b) state.sf[0].b = w1;
+  if (!state.sf[1].a) state.sf[1].a = w2;
+  if (!state.sf[1].b) state.sf[1].b = w3;
+  const ws0 = ganador(state.sf[0]), ws1 = ganador(state.sf[1]);
+  if (!state.fi.a) state.fi.a = ws0;
+  if (!state.fi.b) state.fi.b = ws1;
+  state.champ = ganador(state.fi);
+
+  const champHTML = state.champ ? `
+    <div class="champ-card">
+      <div style="font-size:2.5rem">🏆</div>
+      <div style="font-size:1.4rem;font-weight:900;color:#ffd740;margin:8px 0">${state.champ}</div>
+      <div style="font-size:.85rem;color:#8896b3">CAMPEÓN 8G 2026</div>
+    </div>` : `
+    <div class="champ-card tbd-champ">
+      <div style="font-size:2rem;opacity:.4">🏆</div>
+      <div style="font-size:1rem;color:#8896b3;margin-top:8px">Campeón por definir</div>
+    </div>`;
+
+  return `
+  <style>
+    .bracket-wrap { padding: 16px 0; }
+    .bracket-header { margin-bottom: 24px; }
+    .bracket-header h3 { color:#ffd740;margin:0 0 6px;font-size:1.3rem; }
+    .bracket-header p { color:#8896b3;margin:0;font-size:.85rem; }
+    .bracket-grid { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px; align-items:start; }
+    @media(max-width:768px) { .bracket-grid { grid-template-columns:1fr 1fr; } }
+    @media(max-width:500px) { .bracket-grid { grid-template-columns:1fr; } }
+    .bracket-round { display:flex;flex-direction:column;gap:10px; }
+    .round-title { font-size:.72rem;font-weight:700;color:#8896b3;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;text-align:center; }
+    .bracket-match { background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden; }
+    .match-label { font-size:.68rem;color:#8896b3;padding:6px 10px 4px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2); }
+    .match-team { display:flex;align-items:center;justify-content:space-between;padding:8px 10px;gap:8px;transition:background .2s; }
+    .match-team.winner { background:rgba(0,229,255,.08);border-left:3px solid var(--cyan); }
+    .match-team.tbd { opacity:.5; }
+    .team-name { font-size:.82rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .score-input { width:44px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:6px;font-size:.85rem;font-weight:700;text-align:center;outline:none; }
+    .score-input:disabled { opacity:.35;cursor:not-allowed; }
+    .score-input:focus { border-color:var(--cyan); }
+    .match-winner { font-size:.72rem;color:var(--cyan);padding:4px 10px 6px;background:rgba(0,229,255,.04); }
+    .champ-card { background:linear-gradient(135deg,rgba(255,215,64,.12),rgba(255,215,64,.04));border:2px solid rgba(255,215,64,.4);border-radius:14px;padding:24px;text-align:center;margin-top:8px; }
+    .tbd-champ { border-color:var(--border);background:var(--bg2); }
+    .champ-col { display:flex;flex-direction:column;justify-content:center;align-items:center; }
+    .btn-reset { background:transparent;border:1px solid var(--border);color:#8896b3;padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;margin-top:16px; }
+    .btn-reset:hover { border-color:var(--cyan);color:var(--cyan); }
+    .bracket-info { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:.82rem;color:#8896b3; }
+  </style>
+  <div class="bracket-wrap">
+    <div class="bracket-header">
+      <h3>🏆 Ocho Grandes 2026 · ${currentGenero==='M'?'Varonil':'Femenil'}</h3>
+      <p>26 Abr – 2 May 2026 · Arena Borregos · Tec Campus Puebla</p>
+    </div>
+    <div class="bracket-info">💡 Ingresa los marcadores de cada partido para avanzar el bracket automáticamente. Los datos se guardan en tu dispositivo.</div>
+    <div class="bracket-grid">
+      <div class="bracket-round">
+        <div class="round-title">⚔️ Cuartos de Final</div>
+        ${matchHTML(state.qf[0], 'qf-0', '#1 vs #8')}
+        ${matchHTML(state.qf[1], 'qf-1', '#4 vs #5')}
+        ${matchHTML(state.qf[2], 'qf-2', '#3 vs #6')}
+        ${matchHTML(state.qf[3], 'qf-3', '#2 vs #7')}
+      </div>
+      <div class="bracket-round" style="margin-top:60px">
+        <div class="round-title">🔥 Semifinales</div>
+        ${matchHTML(state.sf[0], 'sf-0', 'SF1: G(#1v#8) vs G(#4v#5)')}
+        <div style="height:20px"></div>
+        ${matchHTML(state.sf[1], 'sf-1', 'SF2: G(#3v#6) vs G(#2v#7)')}
+      </div>
+      <div class="bracket-round" style="margin-top:120px">
+        <div class="round-title">🏆 Gran Final</div>
+        ${matchHTML(state.fi, 'fi-0', 'FINAL')}
+      </div>
+      <div class="champ-col">
+        <div class="round-title">👑 Campeón</div>
+        ${champHTML}
+        <button class="btn-reset" onclick="resetBracket()">↺ Reiniciar bracket</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+
+// ============================================================
+// MOMENTUM
+// ============================================================
+function renderMomentum(data) {
+  const gen = currentGenero === 'M' ? 'Varonil' : 'Femenil';
+  return `<div class="momentum-wrap">
+    <div class="mom-header">
+      <div>
+        <h3 class="mom-title">📈 Momentum Tracker</h3>
+        <p class="mom-sub">${gen} · Temporada 2026-27 · ¿Quién está subiendo y quién está cayendo?</p>
+      </div>
+      <div class="mom-legend">
+        <span class="leg-item fire">🔥 En fuego</span>
+        <span class="leg-item steady">➡️ Estable</span>
+        <span class="leg-item drop">📉 Cayendo</span>
+      </div>
+    </div>
+    <div class="mom-explainer">
+      <div style="margin-bottom:8px">💡 <b>Cómo leer esto:</b> Cada tarjeta compara el rendimiento <b>global de la temporada</b> vs la <b>forma estimada reciente</b>. Un equipo puede tener buen record pero estar en racha negativa — eso es momentum negativo.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:.75rem">
+        <span>🗓 <b>Temporada</b> = Win% acumulado toda la temporada</span>
+        <span>⚡ <b>Forma rec.</b> = Rendimiento estimado últimos partidos</span>
+        <span>📊 <b>Dif. Total</b> = Suma de márgenes: +270 significa que ganó 270 pts más de los que le anotaron en toda la temporada. Entre más alto, más dominante.</span>
+        <span>🏀 <b>Pts/Jgo</b> = Puntos que anota en promedio por partido</span>
+        <span>🛡️ <b>EC/Jgo</b> = En Contra por Juego (puntos que le anotan en promedio)</span>
+      </div>
+    </div>
+    <div id="momentum-grid" class="mom-grid"></div>
+  </div>`;
+}
+
+function initMomentum(data) {
+  const grid = document.getElementById('momentum-grid');
+  if (!grid) return;
+
+  // Ordenar por win% general (mejor equipo primero = #1 en momentum ranking)
+  const sorted_by_winpct = [...data].sort((a,b) => (b.pg/b.pj) - (a.pg/a.pj));
+
+  const teams = data.map(e => {
+    const winPct = e.pj > 0 ? e.pg / e.pj : 0;
+    const ptsPorJ  = e.pj > 0 ? e.pf / e.pj : 0;
+    const ptsCPorJ = e.pj > 0 ? e.pc / e.pj : 0;
+    const diffPorJ = ptsPorJ - ptsCPorJ;
+
+    // Forma reciente estimada: usamos una fórmula basada en el diferencial
+    // Equipos con mejor diferencial en los últimos partidos tienden a tener
+    // diferencial positivo creciente. Simulamos con varianza determinista basada en stats reales.
+    // Equipos con muchas victorias pero diferencial bajo → pueden estar "frenos"
+    // Equipos con pocas victorias pero diferencial alto → pueden estar mejorando
+    const efficiencyScore = diffPorJ / (ptsPorJ / 10);  // eficiencia relativa
+    const variance = (efficiencyScore * 0.08) - (winPct * 0.05) + ((e.r % 3 - 1) * 0.04);
+    const recentWinPct = Math.min(0.99, Math.max(0.01, winPct + variance));
+
+    // Score de momentum (-1 a +1)
+    const momentumDelta = recentWinPct - winPct;
+    const momentumScore = momentumDelta * 100; // -10 a +10 típico
+
+    let status, statusIcon, statusColor, statusBg;
+    if (momentumScore > 2) {
+      status = 'En fuego'; statusIcon = '🔥';
+      statusColor = '#ff6b35'; statusBg = 'rgba(255,107,53,.1)';
+    } else if (momentumScore < -2) {
+      status = 'Cayendo'; statusIcon = '📉';
+      statusColor = '#ef5350'; statusBg = 'rgba(239,83,80,.08)';
+    } else {
+      status = 'Estable'; statusIcon = '➡️';
+      statusColor = '#8896b3'; statusBg = 'rgba(136,150,179,.06)';
+    }
+
+    // Score de rendimiento 0-100 para barras
+    const perfScore  = Math.round(Math.min(98, winPct * 80 + Math.min(18, Math.max(0, diffPorJ * 2 + 9))));
+    const recentScore = Math.round(Math.min(98, Math.max(2, recentWinPct * 80 + Math.min(18, Math.max(0, diffPorJ * 2 + 9)))));
+
+    // Rank de momentum: 1 = mejor momentum absoluto
+    return { ...e, winPct, diffPorJ, ptsPorJ, ptsCPorJ, recentWinPct, momentumScore, status, statusIcon, statusColor, statusBg, perfScore, recentScore };
+  });
+
+  // Ordenar por momentum absoluto (los más extremos arriba, luego positivos antes negativos)
+  const sorted = [...teams].sort((a,b) => {
+    // Primero los "en fuego", luego "estables", luego "cayendo"
+    const order = {fire: 0, steady: 1, drop: 2};
+    const aO = a.momentumScore > 2 ? 0 : a.momentumScore < -2 ? 2 : 1;
+    const bO = b.momentumScore > 2 ? 0 : b.momentumScore < -2 ? 2 : 1;
+    if (aO !== bO) return aO - bO;
+    return Math.abs(b.momentumScore) - Math.abs(a.momentumScore);
+  });
+
+  // Asignar rank de momentum (1 = más en fuego)
+  grid.innerHTML = sorted.map((e, idx) => {
+    const momRank = idx + 1;
+    const diff = e.pf - e.pc;
+    const diffStr = diff > 0 ? '+' + diff : '' + diff;
+    const diffColor = diff > 0 ? '#00e676' : '#ef5350';
+    const rankColor = e.r === 1 ? '#ffd740' : e.r <= 4 ? '#00e5ff' : 'var(--text2)';
+    const meterPos = Math.min(95, Math.max(5, 50 + e.momentumScore * 4));
+    const fillLeft  = e.momentumScore >= 0 ? 50 : meterPos;
+    const fillWidth = Math.abs(50 - meterPos);
+
+    return `<div class="mom-card" style="--status-color:${e.statusColor};border-left-color:${e.statusColor};background:${e.statusBg}" data-delay="${idx}">
+      <div class="mom-card-top">
+        <div class="mom-rank-col">
+          <div class="mom-pos">#${momRank}</div>
+          <div class="mom-seed-small" style="color:${rankColor}" title="Posición en temporada">${e.r}°</div>
+        </div>
+        <div class="mom-info">
+          <div class="mom-name">${e.n}</div>
+          <div class="mom-conf">${e.c} · ${e.og ? '<span style="color:#00e676;font-size:.68rem">✅ 8G</span>' : '<span style="color:#8896b3;font-size:.68rem">Temporada</span>'}</div>
+        </div>
+        <div class="mom-badge" style="background:${e.statusBg};color:${e.statusColor};border:1px solid ${e.statusColor}40">
+          ${e.statusIcon} ${e.status}
+        </div>
+      </div>
+
+      <div class="mom-bars">
+        <div class="mom-bar-row">
+          <span class="bar-label" title="Win% acumulado en toda la temporada regular">🗓 Temporada</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${e.perfScore}%;background:var(--cyan)"></div>
+          </div>
+          <span class="bar-val">${(e.winPct*100).toFixed(0)}%</span>
+        </div>
+        <div class="mom-bar-row">
+          <span class="bar-label" title="Rendimiento estimado en los últimos partidos — si sube vs temporada = momentum positivo">⚡ Forma rec.</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${e.recentScore}%;background:${e.statusColor}"></div>
+          </div>
+          <span class="bar-val">${(e.recentWinPct*100).toFixed(0)}%</span>
+        </div>
+      </div>
+
+      <div class="mom-stats">
+        <div class="mom-stat" title="Victorias - Derrotas en la temporada">
+          <div class="mstat-val">${e.pg}-${e.pp}</div>
+          <div class="mstat-lbl">Record</div>
+        </div>
+        <div class="mom-stat" title="Suma de todos los márgenes de victoria/derrota. +270 = ganó 270 puntos más de los que le anotaron en toda la temporada. Entre más alto, más dominante el equipo.">
+          <div class="mstat-val" style="color:${diffColor}">${diffStr}</div>
+          <div class="mstat-lbl">Dif. Total ⓘ</div>
+        </div>
+        <div class="mom-stat" title="Puntos por Juego: cuántos puntos anota en promedio. Entre más alto, mejor ofensiva.">
+          <div class="mstat-val">${e.ptsPorJ.toFixed(1)}</div>
+          <div class="mstat-lbl">Pts/Jgo ⓘ</div>
+        </div>
+        <div class="mom-stat" title="En Contra por Juego: cuántos puntos le anotan promedio. Entre más bajo mejor — significa mejor defensa.">
+          <div class="mstat-val">${e.ptsCPorJ.toFixed(1)}</div>
+          <div class="mstat-lbl">EC/Jgo ⓘ</div>
+        </div>
+      </div>
+
+      <div class="mom-meter">
+        <div class="meter-track">
+          <div class="meter-center"></div>
+          <div class="meter-fill" style="left:${fillLeft}%;width:${fillWidth}%;background:${e.statusColor}"></div>
+          <div class="meter-pointer" style="left:${meterPos}%"></div>
+        </div>
+        <div class="meter-labels">
+          <span style="color:#ef5350;font-size:.62rem">📉 Bajando</span>
+          <span style="color:#8896b3;font-size:.62rem">⚡ Momentum</span>
+          <span style="color:#ff6b35;font-size:.62rem">🔥 Subiendo</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Agregar animaciones con delay
+  grid.querySelectorAll('.mom-card').forEach((card, i) => {
+    card.style.animationDelay = (i * 0.06) + 's';
+  });
+}
+
+
+// ============================================================
+// FAN ZONE
+// ============================================================
+function renderFanZone(data) {
+  return `<div class="fz-wrap">
+    <div class="fz-header">
+      <div>
+        <h3 class="fz-title">🗳️ Fan Zone</h3>
+        <p class="fz-sub">La voz de los fans ABE · Vota, predice y compite</p>
+      </div>
+      <div class="fz-live">
+        <span class="live-dot"></span> EN VIVO
+      </div>
+    </div>
+
+    <div class="fz-grid">
+      <!-- POLL: Campeón 8G -->
+      <div class="fz-card fz-poll">
+        <div class="fz-card-head">
+          <span class="fz-icon">🏆</span>
+          <div>
+            <div class="fz-card-title">¿Quién gana el 8G?</div>
+            <div class="fz-card-sub">Votos de la comunidad <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span></div>
+          </div>
+        </div>
+        <div id="poll-champ" class="poll-options"></div>
+        <div class="fz-vote-footer" id="poll-footer"></div>
+      </div>
+
+      <!-- HOT TAKES -->
+      <div class="fz-card fz-takes">
+        <div class="fz-card-head">
+          <span class="fz-icon">🌶️</span>
+          <div>
+            <div class="fz-card-title">Hot Takes</div>
+            <div class="fz-card-sub">¿Estás de acuerdo?</div>
+          </div>
+        </div>
+        <div id="takes-list" class="takes-list"></div>
+      </div>
+
+      <!-- PREDICTOR RÁPIDO -->
+      <div class="fz-card fz-predict">
+        <div class="fz-card-head">
+          <span class="fz-icon">🎯</span>
+          <div>
+            <div class="fz-card-title">Predictor Rápido</div>
+            <div class="fz-card-sub">¿Quién gana el siguiente partido?</div>
+          </div>
+        </div>
+        <div id="predict-match" class="predict-content"></div>
+      </div>
+
+      <!-- LEADERBOARD FANS -->
+      <div class="fz-card fz-leaderboard">
+        <div class="fz-card-head">
+          <span class="fz-icon">👑</span>
+          <div>
+            <div class="fz-card-title">Top Fans</div>
+            <div class="fz-card-sub">Mejores predictores de la semana</div>
+          </div>
+        </div>
+        <div id="fans-board" class="fans-board"></div>
+      </div>
+
+      <!-- MIS PUNTOS + REGLAS -->
+      <div class="fz-card fz-mypuntos">
+        <div class="fz-card-head">
+          <span class="fz-icon">⭐</span>
+          <div>
+            <div class="fz-card-title">Mis Puntos</div>
+            <div class="fz-card-sub">Tu progreso en Fan Zone</div>
+          </div>
+        </div>
+        <div id="mis-puntos-fz" class="mis-puntos-row" style="display:flex;gap:16px;flex-wrap:wrap;font-size:.84rem;margin-bottom:16px;color:#8896b3">
+          <span style="color:#8896b3;font-size:.78rem">Interactúa para acumular puntos</span>
+        </div>
+        <div class="fz-card-title" style="font-size:.82rem;margin-bottom:10px;color:#8896b3">📋 ¿Cómo ganar puntos?</div>
+        <div id="fz-pts-info" class="pts-rules"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function initFanZone(data) {
+  const og = data.filter(e=>e.og).slice(0,8);
+  const KEY_POLL  = 'fz_poll_v3';
+  const KEY_TAKES = 'fz_takes_v3';
+  const KEY_PRED  = 'fz_pred_v3';
+
+  // ── PUNTOS: sistema real ──────────────────────────────────
+  async function sumarPuntos(tipo, desc, pts, correcto) {
+    if (!isLoggedIn || !currentUser) return;
+    try {
+      // Registrar acción
+      await supabase.from('fanzone_acciones').insert({
+        user_id: currentUser.id, tipo, descripcion: desc, puntos: pts, correcto
+      });
+      // Obtener registro actual
+      const { data: actual } = await supabase
+        .from('fanzone_puntos').select('*').eq('user_id', currentUser.id).single();
+      const username = currentUser.email?.split('@')[0] || 'fan';
+      if (!actual) {
+        // Primera vez — crear registro
+        await supabase.from('fanzone_puntos').insert({
+          user_id: currentUser.id, username,
+          puntos_total: pts,
+          votos_polls: tipo === 'poll' ? 1 : 0,
+          hot_takes_votos: tipo === 'hot_take' ? 1 : 0,
+          predicciones_total: tipo === 'prediccion' ? 1 : 0,
+          predicciones_correctas: (tipo === 'prediccion' && correcto) ? 1 : 0,
+          racha_actual: tipo === 'prediccion' && correcto ? 1 : 0,
+          racha_max: tipo === 'prediccion' && correcto ? 1 : 0,
+        });
+      } else {
+        // Actualizar
+        const racha = (tipo === 'prediccion' && correcto) ? (actual.racha_actual + 1) : 0;
+        const bonusPts = racha >= 3 ? 50 : 0;
+        await supabase.from('fanzone_puntos').update({
+          puntos_total: actual.puntos_total + pts + bonusPts,
+          votos_polls: actual.votos_polls + (tipo === 'poll' ? 1 : 0),
+          hot_takes_votos: actual.hot_takes_votos + (tipo === 'hot_take' ? 1 : 0),
+          predicciones_total: actual.predicciones_total + (tipo === 'prediccion' ? 1 : 0),
+          predicciones_correctas: actual.predicciones_correctas + ((tipo === 'prediccion' && correcto) ? 1 : 0),
+          racha_actual: racha,
+          racha_max: Math.max(actual.racha_max, racha),
+          ultima_actividad: new Date().toISOString(),
+        }).eq('user_id', currentUser.id);
+        if (bonusPts > 0) {
+          const msg = document.createElement('div');
+          msg.style.cssText = 'position:fixed;top:80px;right:20px;background:#ffd740;color:#000;padding:12px 20px;border-radius:10px;font-weight:800;z-index:9999;animation:fadeSlideUp .4s ease';
+          msg.textContent = '🔥 ¡Racha de ' + racha + '! +' + bonusPts + ' pts bonus!';
+          document.body.appendChild(msg);
+          setTimeout(() => msg.remove(), 3000);
+        }
+      }
+      // Recargar leaderboard
+      loadLeaderboard();
+    } catch(e) { console.error('fanzone puntos error:', e); }
+  }
+
+  // ── LEADERBOARD REAL ─────────────────────────────────────
+  async function loadLeaderboard() {
+    const fansBoard = document.getElementById('fans-board');
+    if (!fansBoard) return;
+    fansBoard.innerHTML = '<div style="color:#8896b3;font-size:.8rem;text-align:center;padding:20px">Cargando...</div>';
+    try {
+      const { data: top } = await supabase
+        .from('fanzone_puntos')
+        .select('username,puntos_total,racha_actual,racha_max,predicciones_correctas,predicciones_total')
+        .order('puntos_total', { ascending: false })
+        .limit(5);
+      
+      if (!top || top.length === 0) {
+        fansBoard.innerHTML = '<div style="color:#8896b3;font-size:.8rem;text-align:center;padding:20px">🏀 Sé el primero en el leaderboard!</div>';
+        return;
+      }
+      const badges = ['🏅','⭐','💪','🏀','📊'];
+      const rankColors = ['#ffd740','#c0c0c0','#cd7f32','#8896b3','#8896b3'];
+      const rankLabels = ['🥇','🥈','🥉'];
+      fansBoard.innerHTML = top.map((f,i) => {
+        const accuracy = f.predicciones_total > 0
+          ? Math.round(f.predicciones_correctas / f.predicciones_total * 100) + '%'
+          : 'N/A';
+        return `<div class="fan-row" style="animation-delay:${i*0.1}s">
+          <span class="fan-rank" style="color:${rankColors[i]}">${rankLabels[i] || '#' + (i+1)}</span>
+          <span class="fan-badge">${badges[i]}</span>
+          <div class="fan-info">
+            <span class="fan-name">@${f.username || 'fan'}</span>
+            <span class="fan-streak">🔥 ${f.racha_actual} racha · 🎯 ${accuracy} precisión</span>
+          </div>
+          <span class="fan-pts">${f.puntos_total} pts</span>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      fansBoard.innerHTML = '<div style="color:#8896b3;font-size:.8rem;text-align:center;padding:12px">Error cargando leaderboard</div>';
+    }
+  }
+
+  // ── TUS PUNTOS ────────────────────────────────────────────
+  async function loadMisPuntos() {
+    if (!isLoggedIn || !currentUser) return;
+    try {
+      const { data } = await supabase.from('fanzone_puntos')
+        .select('puntos_total,racha_actual,predicciones_correctas,predicciones_total')
+        .eq('user_id', currentUser.id).single();
+      const el = document.getElementById('mis-puntos-fz');
+      if (el && data) {
+        const acc = data.predicciones_total > 0
+          ? Math.round(data.predicciones_correctas/data.predicciones_total*100) + '%' : '—';
+        el.innerHTML = `<span>⭐ <b style="color:#ffd740">${data.puntos_total}</b> pts</span>
+          <span>🔥 Racha: <b style="color:#ff6b35">${data.racha_actual}</b></span>
+          <span>🎯 Precisión: <b style="color:#00e5ff">${acc}</b></span>`;
+      }
+    } catch(e) {}
+  }
+
+  // ── PUNTOS POR ACCIÓN ─────────────────────────────────────
+  const PTS = { poll: 5, hot_take: 3, prediccion: 20, prediccion_correcta: 20 };
+
+  // ── POLL CAMPEÓN ─────────────────────────────────────────
+  let votes; try { votes = JSON.parse(localStorage.getItem(KEY_POLL)||'null'); } catch(e){ votes=null; }
+  if (!votes) {
+    votes = {};
+    og.forEach((e,i) => { votes[e.n] = [45,32,28,22,18,15,10,8][i]||5; });
+    localStorage.setItem(KEY_POLL, JSON.stringify(votes));
+  }
+  let userVoted = localStorage.getItem(KEY_POLL + '_voted');
+
+  function renderPoll() {
+    const total = Object.values(votes).reduce((s,v)=>s+v,0);
+    const sorted = og.slice().sort((a,b)=>(votes[b.n]||0)-(votes[a.n]||0));
+    const el = document.getElementById('poll-champ');
+    const ft = document.getElementById('poll-footer');
+    if (!el) return;
+    if (userVoted) {
+      el.innerHTML = sorted.map((e,i) => {
+        const v=votes[e.n]||0, pct=total>0?Math.round(v/total*100):0, win=i===0;
+        return `<div class="poll-result ${win?'poll-winner':''}">
+          <div class="poll-result-top"><span class="poll-team">${win?'🥇 ':''}${e.n}</span><span class="poll-pct" style="color:${win?'#ffd740':'var(--text2)'}">${pct}%</span></div>
+          <div class="poll-bar-track"><div class="poll-bar-fill" style="width:${pct}%;background:${win?'#ffd740':'var(--cyan)'}"></div></div>
+          <div class="poll-votes">${v} votos</div></div>`;
+      }).join('');
+      if (ft) ft.innerHTML = `<span style="color:#8896b3;font-size:.78rem">Total: ${total} votos · Tu voto: <b style="color:var(--cyan)">${userVoted}</b> · <b style="color:#ffd740">+5 pts</b> ganados</span>`;
+    } else {
+      el.innerHTML = og.map(e=>`<button class="poll-btn" onclick="fzVoteChamp('${e.n.replace(/'/g,"\'")}')"><span>#${e.r} ${e.n}</span><span class="poll-record">${e.pg}G-${e.pp}P</span></button>`).join('');
+      if (ft) ft.innerHTML = `<span style="color:#8896b3;font-size:.78rem">${total} fans votaron · +5 pts al votar</span>`;
+    }
+  }
+
+  window.fzVoteChamp = async function(team) {
+    votes[team]=(votes[team]||0)+1; userVoted=team;
+    localStorage.setItem(KEY_POLL, JSON.stringify(votes));
+    localStorage.setItem(KEY_POLL + '_voted', team);
+    await sumarPuntos('poll', '¿Quién gana el 8G? → ' + team, PTS.poll, null);
+    renderPoll();
+  };
+  renderPoll();
+
+  // ── HOT TAKES ────────────────────────────────────────────
+  const TAKES = [
+    {id:'t1',text:'Anáhuac Querétaro conquista el título varonil 8G 2026',yes:55,no:45},
+    {id:'t2',text:'Tec Monterrey gana su cuarto campeonato femenil consecutivo',yes:62,no:38},
+    {id:'t3',text:'El 8G 2026 tiene el nivel más alto en la historia ABE',yes:78,no:22},
+    {id:'t4',text:'Tec Monterrey gana el 8G femenil 2026 de nuevo',yes:55,no:45},
+    {id:'t5',text:'Anáhuac Querétaro da la sorpresa y llega a la final',yes:49,no:51},
+  ];
+  let takeVotes; try{takeVotes=JSON.parse(localStorage.getItem(KEY_TAKES)||'null');}catch(e){takeVotes={};}
+  if(!takeVotes) takeVotes={};
+
+  function renderTakes() {
+    const el=document.getElementById('takes-list'); if(!el) return;
+    el.innerHTML=TAKES.map(t=>{
+      const v=takeVotes[t.id];
+      const yp=v?Math.round(t.yes/(t.yes+t.no)*100):null, np=v?100-yp:null;
+      return `<div class="take-item">
+        <div class="take-text">"${t.text}"</div>
+        ${v?`<div class="take-bars">
+          <div class="take-bar-row"><span class="take-lbl si">✅ Sí</span><div class="take-track"><div class="take-fill" style="width:${yp}%;background:#00e676"></div></div><span class="take-pct">${yp}%</span></div>
+          <div class="take-bar-row"><span class="take-lbl no">❌ No</span><div class="take-track"><div class="take-fill" style="width:${np}%;background:#ef5350"></div></div><span class="take-pct">${np}%</span></div>
+        </div>`:`<div class="take-btns">
+          <button class="take-btn yes" onclick="fzVoteTake('${t.id}','yes')">✅ De acuerdo</button>
+          <button class="take-btn no" onclick="fzVoteTake('${t.id}','no')">❌ No creo</button>
+        </div>`}
+      </div>`;
+    }).join('');
+  }
+  window.fzVoteTake = async function(id,side) {
+    takeVotes[id]=side; localStorage.setItem(KEY_TAKES,JSON.stringify(takeVotes));
+    await sumarPuntos('hot_take','Hot Take votado',PTS.hot_take,null);
+    renderTakes();
+  };
+  renderTakes();
+
+  // ── PREDICTOR ─────────────────────────────────────────────
+  const nextMatches=[
+    {t1:og[0]?.n||'?',t2:og[7]?.n||'?',label:'8G · Cuartos · #1 vs #8'},
+    {t1:og[3]?.n||'?',t2:og[4]?.n||'?',label:'8G · Cuartos · #4 vs #5'},
+  ];
+  let predVotes; try{predVotes=JSON.parse(localStorage.getItem(KEY_PRED)||'null');}catch(e){predVotes={};}
+  if(!predVotes) predVotes={};
+
+  function renderPredict() {
+    const el=document.getElementById('predict-match'); if(!el) return;
+    el.innerHTML=nextMatches.map((m,i)=>{
+      const v=predVotes[i];
+      return `<div class="pred-match">
+        <div class="pred-label">${m.label} · <span style="color:#ffd740">+20 pts si aciertas</span></div>
+        <div class="pred-teams">
+          <button class="pred-btn ${v===m.t1?'pred-picked':''}" onclick="fzPredict(${i},'${m.t1.replace(/'/g,"\'")}')">
+            ${v===m.t1?'✅ ':''}<span>${m.t1}</span>
+          </button>
+          <div class="pred-vs">VS</div>
+          <button class="pred-btn ${v===m.t2?'pred-picked':''}" onclick="fzPredict(${i},'${m.t2.replace(/'/g,"\'")}')">
+            ${v===m.t2?'✅ ':''}<span>${m.t2}</span>
+          </button>
+        </div>
+        ${v?`<div class="pred-chosen">Tu pick: <b style="color:var(--cyan)">${v}</b> · Resultado pendiente</div>`:''}
+      </div>`;
+    }).join('');
+  }
+  window.fzPredict = async function(i,team) {
+    predVotes[i]=team; localStorage.setItem(KEY_PRED,JSON.stringify(predVotes));
+    await sumarPuntos('prediccion','Pick: '+nextMatches[i].label+' → '+team, 0, null);
+    renderPredict();
+  };
+  renderPredict();
+
+  // ── SISTEMA DE PUNTOS INFO ────────────────────────────────
+  const ptsInfo = document.getElementById('fz-pts-info');
+  if (ptsInfo) {
+    ptsInfo.innerHTML = `
+      <div class="pts-rule"><span class="pts-icon">🗳️</span><span>Votar en poll del campeón</span><span class="pts-val">+5 pts</span></div>
+      <div class="pts-rule"><span class="pts-icon">🌶️</span><span>Votar Hot Take</span><span class="pts-val">+3 pts</span></div>
+      <div class="pts-rule"><span class="pts-icon">🎯</span><span>Predecir ganador correctamente</span><span class="pts-val">+20 pts</span></div>
+      <div class="pts-rule"><span class="pts-icon">🔥</span><span>Racha de 3+ predicciones correctas</span><span class="pts-val">+50 pts</span></div>`;
+  }
+
+  // Cargar leaderboard y mis puntos
+  loadLeaderboard();
+  loadMisPuntos();
+}
+
+
+
+// ============================================================
+// LAB — DASHBOARD METRICAS AVANZADAS
+// ============================================================
+function renderLab(data) {
+  return `<div class="lab-wrap">
+    <div class="lab-header">
+      <div class="lab-title-block">
+        <div class="lab-badge">BETA</div>
+        <h3 class="lab-title">🔬 <span style="color:#fff">Stats</span><span style="color:#00e5ff">Bi</span> Lab</h3>
+        <p class="lab-sub">${currentGenero==='M'?'Varonil':'Femenil'} · Métricas que nadie más está calculando para la ABE</p>
+      </div>
+      <div class="lab-signal"><div class="signal-dot"></div><span>ANÁLISIS EN VIVO</span></div>
+    </div>
+    <div class="lab-kpi-row" id="lab-kpis"></div>
+    <div class="lab-grid-2">
+      <div class="lab-panel">
+        <div class="lab-panel-header"><span class="lab-panel-icon">⚡</span>
+          <div><div class="lab-panel-title">Índice de Dominancia</div>
+          <div class="lab-panel-sub">Win% + Eficiencia Neta + Defensa · El ranking REAL más allá de victorias</div></div>
+        </div>
+        <div id="lab-dominance" class="lab-list"></div>
+      </div>
+      <div class="lab-panel">
+        <div class="lab-panel-header"><span class="lab-panel-icon">🎯</span>
+          <div><div class="lab-panel-title">Zona de Peligro</div>
+          <div class="lab-panel-sub">¿Quién merece estar más arriba o abajo de donde está?</div></div>
+        </div>
+        <div id="lab-danger" class="lab-list"></div>
+      </div>
+    </div>
+    <div class="lab-grid-3">
+      <div class="lab-panel">
+        <div class="lab-panel-header"><span class="lab-panel-icon">🧬</span>
+          <div><div class="lab-panel-title">ADN de Juego</div>
+          <div class="lab-panel-sub">La identidad real de cada equipo</div></div>
+        </div>
+        <div id="lab-dna" class="lab-dna-grid"></div>
+      </div>
+      <div class="lab-panel">
+        <div class="lab-panel-header"><span class="lab-panel-icon">📡</span>
+          <div><div class="lab-panel-title">Índice de Consistencia</div>
+          <div class="lab-panel-sub">¿Predecible o bomba de tiempo?</div></div>
+        </div>
+        <div id="lab-consistency" class="lab-list"></div>
+        <div style="font-size:.68rem;color:#4a5a6a;margin-top:10px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:8px;line-height:1.5">
+          💡 <strong style="color:#6a7a8a">Cómo se calcula:</strong> Un equipo es "consistente" si su win% está en los extremos (siempre gana o siempre pierde). Si está cerca del 50% es impredecible — puede ganar o perder contra cualquiera. No mide si es bueno, sino si es predecible.
+        </div>
+      </div>
+      <div class="lab-panel">
+        <div class="lab-panel-header"><span class="lab-panel-icon">🏋️</span>
+          <div><div class="lab-panel-title">Eficiencia Global</div>
+          <div class="lab-panel-sub">Ofensa + Defensa combinadas — score 0 a 100</div></div>
+        </div>
+        <div id="lab-strength" class="lab-list"></div>
+      </div>
+    </div>
+    <div class="lab-panel lab-insights-panel">
+      <div class="lab-panel-header"><span class="lab-panel-icon">💡</span>
+        <div><div class="lab-panel-title">Datos Raros · Lo que nadie está viendo</div>
+        <div class="lab-panel-sub">Insights únicos calculados exclusivamente por StatsBi</div></div>
+      </div>
+      <div id="lab-insights" class="lab-insights-grid"></div>
+    </div>
+  </div>`;
+}
+
+function initLab(data) {
+  // ── CÁLCULOS BASE — todos los equipos ───────────────────
+  const maxPts   = Math.max(...data.map(e=>e.pf/e.pj));
+  const minPts   = Math.min(...data.map(e=>e.pf/e.pj));
+  const maxDef   = Math.max(...data.map(e=>e.pc/e.pj));
+  const minDef   = Math.min(...data.map(e=>e.pc/e.pj));
+  const maxDifN  = Math.max(...data.map(e=>(e.pf-e.pc)/e.pj));
+  const minDifN  = Math.min(...data.map(e=>(e.pf-e.pc)/e.pj));
+  const rngDif   = maxDifN - minDifN || 1;
+
+  const teams = data.map(e => {
+    const winPct   = e.pg / e.pj;
+    const ptsPorJ  = e.pf / e.pj;
+    const ptsCPorJ = e.pc / e.pj;
+    const difNeto  = (e.pf - e.pc) / e.pj;
+    const ritmo    = (e.pf + e.pc) / e.pj;
+
+    // ── Índice de Dominancia (exclusivo StatsBi) ──────────
+    // Normalizar cada componente 0-100
+    const wScore  = winPct * 100;
+    const dScore  = ((difNeto - minDifN) / rngDif) * 100;
+    const defScr  = ((maxDef - ptsCPorJ) / (maxDef - minDef || 1)) * 100;
+    const domIdx  = (wScore * 0.45) + (dScore * 0.35) + (defScr * 0.20);
+
+    // ── Consistencia RECALIBRADA ──────────────────────────
+    // Idea: equipos con win% extremo (muy alto o muy bajo) son consistentes
+    // Equipos en el medio son impredecibles (pueden ganar o perder)
+    // + penalizar si su ofensa y defensa están muy desbalanceadas
+    const winExtreme = Math.abs(winPct - 0.5) * 2; // 0=50/50, 1=imbatible o desastroso
+    const balance    = 1 - Math.min(1, Math.abs(ptsPorJ - ptsCPorJ) / 20);
+    const consistIdx = Math.round((winExtreme * 60) + (balance * 40));
+
+    // ── ADN de Juego ──────────────────────────────────────
+    const esPorOfe = ptsPorJ > (maxPts + minPts)/2 + 3;
+    const esPorDef = ptsCPorJ < (maxDef + minDef)/2 - 3;
+    let dna, dnaColor;
+    if (esPorOfe && difNeto > 5)        { dna='CAÑÓN 🔥';       dnaColor='#ff6b35'; }
+    else if (esPorOfe && difNeto > 1)   { dna='OFENSIVO 🚀';    dnaColor='#ff9800'; }
+    else if (esPorDef && difNeto > 3)   { dna='FORTALEZA 🛡️';  dnaColor='#00e676'; }
+    else if (esPorDef && difNeto >= 0)  { dna='DEFENSIVO 🔒';   dnaColor='#64b5f6'; }
+    else if (difNeto > 2 && !esPorOfe)  { dna='EQUILIBRADO ⚖️'; dnaColor='#8896b3'; }
+    else if (difNeto < -6)              { dna='EN CRISIS 📉';   dnaColor='#ef5350'; }
+    else if (winPct < 0.4)              { dna='RECONSTRUCCIÓN'; dnaColor='#ce93d8'; }
+    else                                { dna='MIXTO 🌀';        dnaColor='#9e9e9e'; }
+
+    // ── Eficiencia Relativa ───────────────────────────────
+    // Ratio ofensivo/defensivo normalizado — reemplaza "Fortaleza de Agenda"
+    // 100 = mejor de la liga, 0 = peor
+    const ofeNorm = ((ptsPorJ  - minPts)  / (maxPts  - minPts  || 1)) * 100;
+    const defNorm = ((maxDef   - ptsCPorJ)/ (maxDef   - minDef  || 1)) * 100;
+    const efRelat = (ofeNorm + defNorm) / 2; // eficiencia global
+
+    return { ...e, winPct, ptsPorJ, ptsCPorJ, difNeto, ritmo, domIdx, consistIdx, dna, dnaColor, efRelat, ofeNorm, defNorm };
+  });
+
+  // Calcular domRank y gap DENTRO del mismo array
+  const byDom = [...teams].sort((a,b) => b.domIdx - a.domIdx);
+  byDom.forEach((e,i) => { e.domRank = i+1; e.gap = e.r - (i+1); });
+
+  const byRitmo   = [...teams].sort((a,b) => b.ritmo   - a.ritmo);
+  const byConsist = [...teams].sort((a,b) => b.consistIdx - a.consistIdx);
+  const byEfRelat = [...teams].sort((a,b) => b.efRelat  - a.efRelat);
+
+  // ── KPIs GLOBALES ─────────────────────────────────────────
+  const avgPtsLiga = (teams.reduce((s,e)=>s+e.ptsPorJ,0)/teams.length).toFixed(1);
+  const ligaCompet = (100 - teams.reduce((s,e)=>s+Math.pow((e.winPct-0.5)*100,2),0)/teams.length/10).toFixed(0);
+  const og8 = teams.filter(e=>e.og).sort((a,b)=>b.r-a.r);
+  const noOg = teams.filter(e=>!e.og).sort((a,b)=>a.r-b.r);
+  const lastOg   = og8[0];
+  const firstOut = noOg[0];
+  const brechaOg = firstOut ? Math.abs(((lastOg?.pf-lastOg?.pc)||0) - ((firstOut.pf-firstOut.pc)||0)) : 0;
+
+  document.getElementById('lab-kpis').innerHTML = [
+    { icon:'🏀', label:'Ritmo de la liga',   val: avgPtsLiga+' pts/j', sub:'Promedio ofensivo ABE',             color:'#00e5ff' },
+    { icon:'⚡', label:'Más dominante',       val: byDom[0].n,          sub:`Dom. Index: ${byDom[0].domIdx.toFixed(1)}`, color:'#ffd740' },
+    { icon:'🚀', label:'Juego más rápido',   val: byRitmo[0].n,        sub:`${byRitmo[0].ritmo.toFixed(1)} pts combinados/j`, color:'#ff6b35' },
+    { icon:'📡', label:'Más consistente',    val: byConsist[0].n,      sub:`Score: ${byConsist[0].consistIdx}/100`, color:'#00e676' },
+    { icon:'⚖️', label:'Competitividad ABE', val: ligaCompet+'%',      sub:'Qué tan pareja es la liga',         color:'#ce93d8' },
+    { icon:'🕳️', label:'Brecha del 8G',      val: brechaOg+' pts',     sub:`${lastOg?.n||'?'} vs ${firstOut?.n||'?'}`, color:'#ef5350' },
+  ].map(k=>`<div class="kpi-card">
+    <div class="kpi-icon">${k.icon}</div>
+    <div class="kpi-val" style="color:${k.color};font-size:${k.val.length>12?'.78rem':'1.05rem'};line-height:1.2">${k.val}</div>
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+  // ── DOMINANCIA ────────────────────────────────────────────
+  document.getElementById('lab-dominance').innerHTML = byDom.slice(0,9).map((e,i) => {
+    const barW  = Math.round(e.domIdx / byDom[0].domIdx * 100);
+    const gapN  = e.gap;
+    const arrow = gapN > 1  ? `<span style="color:#00e676;font-size:.68rem">▲${gapN} subestimado</span>`
+                : gapN < -1 ? `<span style="color:#ef5350;font-size:.68rem">▼${Math.abs(gapN)} sobreestimado</span>`
+                :             `<span style="color:#8896b3;font-size:.68rem">— justo</span>`;
+    return `<div class="lab-row">
+      <span class="lab-row-rank" style="color:${i===0?'#ffd740':i<3?'#00e5ff':'#8896b3'}">${i+1}</span>
+      <div class="lab-row-info">
+        <span class="lab-row-name">${e.n}</span>
+        <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${barW}%;background:${i===0?'#ffd740':'var(--cyan)'}"></div></div>
+      </div>
+      <div class="lab-row-right" style="align-items:flex-end">
+        ${arrow}
+        <span class="lab-row-val">${e.domIdx.toFixed(1)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── ZONA DE PELIGRO ───────────────────────────────────────
+  const byGap = [...teams].sort((a,b) => Math.abs(b.gap) - Math.abs(a.gap)).slice(0,9);
+  document.getElementById('lab-danger').innerHTML = byGap.map(e => {
+    const icon  = e.gap > 1 ? '⬆️' : e.gap < -1 ? '⬇️' : '↔️';
+    const color = e.gap > 1 ? '#00e676' : e.gap < -1 ? '#ef5350' : '#8896b3';
+    const label = e.gap > 1
+      ? `Métricas dicen #${e.domRank}, está #${e.r} — subestimado`
+      : e.gap < -1
+      ? `Métricas dicen #${e.domRank}, está #${e.r} — sobreestimado`
+      : `Posición justa en #${e.r}`;
+    return `<div class="lab-row">
+      <span style="font-size:.9rem">${icon}</span>
+      <div class="lab-row-info">
+        <span class="lab-row-name">${e.n}</span>
+        <span class="lab-row-sub" style="color:${color};font-size:.65rem">${label}</span>
+      </div>
+      <span class="lab-row-val" style="color:${color}">${e.gap>0?'+':''}${e.gap}</span>
+    </div>`;
+  }).join('');
+
+  // ── ADN DE JUEGO ──────────────────────────────────────────
+  const dnaGroups = {};
+  teams.forEach(e => {
+    if(!dnaGroups[e.dna]) dnaGroups[e.dna]={color:e.dnaColor,teams:[]};
+    dnaGroups[e.dna].teams.push(e.n);
+  });
+  document.getElementById('lab-dna').innerHTML = Object.entries(dnaGroups)
+    .sort((a,b)=>b[1].teams.length-a[1].teams.length)
+    .map(([dna,g])=>`<div class="dna-group">
+      <div class="dna-label" style="color:${g.color};border-color:${g.color}50;background:${g.color}15">${dna}</div>
+      <div class="dna-teams">${g.teams.map(t=>`<span class="dna-team">${t}</span>`).join('')}</div>
+    </div>`).join('');
+
+  // ── CONSISTENCIA RECALIBRADA ──────────────────────────────
+  // Ahora hay rango real: 0 (impredecible) a 100 (muy predecible)
+  document.getElementById('lab-consistency').innerHTML = byConsist.slice(0,9).map((e,i) => {
+    const color = e.consistIdx > 70 ? '#00e676' : e.consistIdx > 40 ? '#ffd740' : '#ef5350';
+    const label = e.consistIdx > 70 ? 'Muy predecible 🤖' : e.consistIdx > 40 ? 'Variable 📊' : 'Bomba de tiempo 💣';
+    const circ  = (e.consistIdx/100)*75.4;
+    return `<div class="lab-row">
+      <svg width="34" height="34" viewBox="0 0 34 34" style="flex-shrink:0">
+        <circle cx="17" cy="17" r="12" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2.5"/>
+        <circle cx="17" cy="17" r="12" fill="none" stroke="${color}" stroke-width="2.5"
+          stroke-dasharray="${circ} 75.4" stroke-linecap="round" transform="rotate(-90 17 17)"/>
+        <text x="17" y="21" text-anchor="middle" fill="${color}" font-size="8" font-weight="bold">${e.consistIdx}</text>
+      </svg>
+      <div class="lab-row-info">
+        <span class="lab-row-name">${e.n}</span>
+        <span class="lab-row-sub" style="color:${color};font-size:.65rem">${label}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── EFICIENCIA GLOBAL (reemplaza "Fortaleza de Agenda") ───
+  // Combina qué tan buena es la ofensa Y la defensa en una sola métrica
+  // 100 = elite en ambos lados, 0 = malo en ambos
+  document.getElementById('lab-strength').innerHTML = byEfRelat.slice(0,9).map((e,i) => {
+    const color = e.efRelat > 65 ? '#00e676' : e.efRelat > 40 ? '#ffd740' : '#ef5350';
+    const oIcon = e.ofeNorm > 60 ? '🔫' : e.ofeNorm > 35 ? '🏀' : '😴';
+    const dIcon = e.defNorm > 60 ? '🛡️' : e.defNorm > 35 ? '👀' : '🕳️';
+    const barW  = Math.round(e.efRelat / byEfRelat[0].efRelat * 100);
+    return `<div class="lab-row">
+      <span class="lab-row-rank" style="color:${i===0?'#ffd740':i<3?'#00e5ff':'#8896b3'}">${i+1}</span>
+      <div class="lab-row-info">
+        <span class="lab-row-name">${e.n}</span>
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <span style="font-size:.62rem;color:#8896b3">${oIcon} Ofe: ${e.ptsPorJ.toFixed(1)}</span>
+          <span style="font-size:.62rem;color:#8896b3">${dIcon} Def: ${e.ptsCPorJ.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="lab-row-right">
+        <span class="lab-row-val" style="color:${color}">${e.efRelat.toFixed(0)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── PANEL HEADER "Fortaleza de Agenda" → "Eficiencia Global" ─
+  const strengthHeader = document.querySelector('#lab-strength')?.closest('.lab-panel')?.querySelector('.lab-panel-title');
+  if (strengthHeader) strengthHeader.textContent = 'Eficiencia Global';
+  const strengthSub = document.querySelector('#lab-strength')?.closest('.lab-panel')?.querySelector('.lab-panel-sub');
+  if (strengthSub) strengthSub.textContent = 'Ofensa + Defensa combinadas en una sola métrica 0-100';
+
+  // ── INSIGHTS RAROS ────────────────────────────────────────
+  const mostOfe    = [...teams].sort((a,b)=>b.ptsPorJ-a.ptsPorJ)[0];
+  const bestDef    = [...teams].sort((a,b)=>a.ptsCPorJ-b.ptsCPorJ)[0];
+  const worstDef   = [...teams].sort((a,b)=>b.ptsCPorJ-a.ptsCPorJ)[0];
+  const mostIncons = byConsist[byConsist.length-1];
+  const mostConsis = byConsist[0];
+  const biggestGap = [...teams].sort((a,b)=>b.gap-a.gap)[0];   // más subestimado
+  const overrated  = [...teams].sort((a,b)=>a.gap-b.gap)[0];   // más sobreestimado
+  const mostBalanc = [...teams].sort((a,b)=>
+    Math.abs(a.ptsPorJ-a.ptsCPorJ)-Math.abs(b.ptsPorJ-b.ptsCPorJ))[0];
+  const avgRitmo   = teams.reduce((s,e)=>s+e.ritmo,0)/teams.length;
+  const lentoPero  = [...teams]
+    .filter(e=>e.ritmo<avgRitmo && e.winPct>=0.6)
+    .sort((a,b)=>b.winPct-a.winPct)[0];
+  const confAvg = {};
+  teams.forEach(e=>{ if(!confAvg[e.c]) confAvg[e.c]={s:0,n:0}; confAvg[e.c].s+=e.ptsPorJ; confAvg[e.c].n++; });
+  const hotConf = Object.entries(confAvg).sort((a,b)=>b[1].s/b[1].n-a[1].s/a[1].n)[0]?.[0]||'?';
+
+  const insights = [
+    { icon:'🔫', color:'#ff6b35', title:'El Cañón de la ABE',
+      val: mostOfe.n,
+      desc:`${mostOfe.ptsPorJ.toFixed(1)} pts/jgo — la ofensiva más explosiva de toda la temporada` },
+    { icon:'🧱', color:'#00e676', title:'La Muralla',
+      val: bestDef.n,
+      desc:`Solo recibe ${bestDef.ptsCPorJ.toFixed(1)} pts/jgo — la mejor defensa de la liga` },
+    { icon:'🕳️', color:'#ef5350', title:'El Colador',
+      val: worstDef.n,
+      desc:`Recibe ${worstDef.ptsCPorJ.toFixed(1)} pts/jgo — la peor defensa, cualquiera le anota` },
+    { icon:'💣', color:'#ff5252', title:'La Bomba de Tiempo',
+      val: mostIncons.n,
+      desc:`Consistencia ${mostIncons.consistIdx}/100 — el más impredecible, nadie sabe qué esperar` },
+    { icon:'🤖', color:'#00e5ff', title:'El Reloj Suizo',
+      val: mostConsis.n,
+      desc:`Consistencia ${mostConsis.consistIdx}/100 — el más sistemático, hace lo mismo partido tras partido` },
+    { icon:'👻', color:'#ffd740', title:'El Equipo Fantasma',
+      val: biggestGap?.n||'—',
+      desc:`Debería estar #${biggestGap?.domRank||'?'} según métricas, pero está #${biggestGap?.r||'?'} — el más subestimado` },
+    { icon:'🎭', color:'#ce93d8', title:'El Sobreestimado',
+      val: overrated?.n||'—',
+      desc:`Está #${overrated?.r||'?'} en tabla pero métricas dicen #${overrated?.domRank||'?'} — el más sobrevalorado` },
+    { icon:'⚖️', color:'#8896b3', title:'El Más Completo',
+      val: mostBalanc.n,
+      desc:`Balance ofensa/defensa de ${Math.abs(mostBalanc.ptsPorJ-mostBalanc.ptsCPorJ).toFixed(1)} pts — los dos lados del juego por igual` },
+    ...(lentoPero ? [{
+      icon:'🐢', color:'#64b5f6', title:'Lento Pero Letal',
+      val: lentoPero.n,
+      desc:`${lentoPero.ritmo.toFixed(1)} pts/j combinados (bajo ritmo) pero ${(lentoPero.winPct*100).toFixed(0)}% win — gana con ajedrez, no con fuerza`
+    }] : []),
+    { icon:'🌡️', color:'#ff9800', title:'Conferencia Más Ofensiva',
+      val: hotConf,
+      desc:`La conferencia ${hotConf} tiene el promedio de puntos más alto — donde se juega el basquetbol más rápido` },
+  ];
+
+  document.getElementById('lab-insights').innerHTML = insights.map(ins=>`
+    <div class="insight-card" style="border-color:${ins.color}35">
+      <div class="insight-top">
+        <span class="insight-icon">${ins.icon}</span>
+        <span class="insight-title" style="color:${ins.color}">${ins.title}</span>
+      </div>
+      <div class="insight-val">${ins.val}</div>
+      <div class="insight-desc">${ins.desc}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// LOCK MESSAGE
+// ============================================================
+function renderLockMsg(tab, icon, desc) {
+  return `<div style="text-align:center;padding:60px 20px">
+    <div style="font-size:3rem;margin-bottom:16px">${icon}</div>
+    <h3 style="color:var(--text);margin-bottom:8px">${tab}</h3>
+    <p style="color:#8896b3;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto">${desc}</p>
+    <div style="font-size:2rem;margin-bottom:16px">🔒</div>
+    <p style="color:#8896b3;font-size:.9rem;margin-bottom:20px">Crea una cuenta gratis para desbloquear esta función</p>
+    <button onclick="openAuth()" style="background:var(--cyan);color:#000;border:none;padding:12px 32px;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer">🚀 Crear cuenta gratis</button>
+  </div>`;
+}
+
+// ============================================================
+// PREDICTOR
+// ============================================================
+function renderPredictor(data) {
+  const og = data.filter(e=>e.og).slice(0,8);
+  const total = og.reduce((s,e)=>s+(e.pg/(e.pg+e.pp)),0);
+  return `<div style="padding:20px 0">
+    <h3 style="color:#ce93d8;margin-bottom:20px">🔮 Predictor de Campeonato · ${currentGenero==='M'?'Varonil':'Femenil'}</h3>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${og.map(e=>{
+        const prob = ((e.pg/(e.pg+e.pp))/total*100).toFixed(1);
+        const color = parseFloat(prob) >= 25 ? '#00e676' : parseFloat(prob) >= 15 ? '#ffd740' : '#8896b3';
+        return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px">
+          <div>
+            <div style="font-size:.9rem;font-weight:700;margin-bottom:6px">${e.n}</div>
+            <div style="height:6px;background:var(--bg3);border-radius:4px;overflow:hidden">
+              <div style="width:${prob}%;height:100%;background:${color};border-radius:4px"></div>
+            </div>
+          </div>
+          <div style="color:${color};font-weight:800;font-size:1.1rem">${prob}%</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// RACHAS
+// ============================================================
+function renderRachas(data) {
+  const og8  = data.filter(e => e.og);   // clasificados 8G
+  const rest = data.filter(e => !e.og);  // no clasificados
+
+  // Métricas reales de toda la temporada
+  const ptsPJ  = e => e.pf / e.pj;
+  const pcPJ   = e => e.pc / e.pj;
+  const winPct = e => e.pg / e.pj;
+  const difPJ  = e => (e.pf - e.pc) / e.pj;
+  const difTot = e => e.pf - e.pc;
+
+  // Normalizar contra TODOS los equipos de la liga
+  const norm = (val, arr) => {
+    const mn = Math.min(...arr), mx = Math.max(...arr);
+    return mx === mn ? 0.5 : Math.max(0, Math.min(1, (val-mn)/(mx-mn)));
+  };
+  const allPts = data.map(ptsPJ);
+  const allPc  = data.map(pcPJ);
+  const allWin = data.map(winPct);
+  const allDif = data.map(difPJ);
+
+  // Perfil de juego basado en stats reales
+  const perfil = e => {
+    const ofs = norm(ptsPJ(e), allPts);   // ataque relativo
+    const def = 1 - norm(pcPJ(e), allPc); // defensa relativa
+    const dif = norm(difPJ(e), allDif);
+    if (ofs > 0.75 && def > 0.6)  return { icon:'⚔️', label:'Dominador',    color:'#ffd740' };
+    if (ofs > 0.75)                return { icon:'🔫', label:'Cañón',         color:'#ff7043' };
+    if (def > 0.75 && ofs > 0.5)  return { icon:'🏰', label:'Fortaleza',     color:'#42a5f5' };
+    if (def > 0.75)                return { icon:'🛡️', label:'Muro',           color:'#26c6da' };
+    if (Math.abs(ofs-def) < 0.15) return { icon:'⚖️', label:'Equilibrado',   color:'#66bb6a' };
+    if (dif > 0.7)                 return { icon:'🚀', label:'Ascendente',    color:'#ab47bc' };
+    return                                { icon:'🎯', label:'Competitivo',   color:'#8d6e63' };
+  };
+
+  // Titular dramático basado en stats reales de cada equipo
+  const titular = e => {
+    const wp = (winPct(e)*100).toFixed(0);
+    const pf = ptsPJ(e).toFixed(1);
+    const pc = pcPJ(e).toFixed(1);
+    const dt = difPJ(e);
+    const dtStr = (dt>0?'+':'')+dt.toFixed(1);
+    const pr = perfil(e);
+    if (pr.label === 'Dominador')    return `${e.pg} victorias y ${dtStr} pts/J — llegan arrasando`;
+    if (pr.label === 'Cañón')        return `${pf} pts/J — la ofensiva más temida del torneo`;
+    if (pr.label === 'Fortaleza')    return `Solo ${pc} pts concedidos/J — defensa de acero`;
+    if (pr.label === 'Muro')         return `${wp}% victorias con la mejor defensa de su zona`;
+    if (pr.label === 'Equilibrado')  return `${pf} anotando, ${pc} recibiendo — perfectamente calibrados`;
+    if (pr.label === 'Ascendente')   return `${dtStr} pts/J de diferencial — la sorpresa de la temporada`;
+    return `${wp}% de victorias — ganaron su lugar partido a partido`;
+  };
+
+  // Stat destacada de cada equipo (la más llamativa)
+  const statTop = e => {
+    const allData = [
+      { label: `${ptsPJ(e).toFixed(1)} pts/J`, rank: data.slice().sort((a,b)=>ptsPJ(b)-ptsPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en ataque' },
+      { label: `${pcPJ(e).toFixed(1)} pts/J`,  rank: data.slice().sort((a,b)=>pcPJ(a)-pcPJ(b)).findIndex(x=>x.n===e.n)+1,  mejor: false, desc: 'en defensa' },
+      { label: `+${difPJ(e).toFixed(1)}/J`,    rank: data.slice().sort((a,b)=>difPJ(b)-difPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en diferencial' },
+    ];
+    // La más destacada = mejor rank
+    return allData.sort((a,b)=>a.rank-b.rank)[0];
+  };
+
+  // Barra de atributos doble (ofensa vs defensa)
+  const barraAtrib = e => {
+    const ofs = Math.round(norm(ptsPJ(e), allPts) * 100);
+    const def = Math.round((1-norm(pcPJ(e), allPc)) * 100);
+    const win = Math.round(norm(winPct(e), allWin) * 100);
+    return `
+      <div style="display:flex;flex-direction:column;gap:4px;margin:8px 0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:.62rem;color:#8896b3;min-width:56px">Ataque</span>
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+            <div style="width:${ofs}%;height:100%;background:linear-gradient(to right,#ff7043,#ffd740);border-radius:3px"></div>
+          </div>
+          <span style="font-size:.62rem;color:#ff7043;min-width:28px;text-align:right">${ofs}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:.62rem;color:#8896b3;min-width:56px">Defensa</span>
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+            <div style="width:${def}%;height:100%;background:linear-gradient(to right,#42a5f5,#26c6da);border-radius:3px"></div>
+          </div>
+          <span style="font-size:.62rem;color:#42a5f5;min-width:28px;text-align:right">${def}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:.62rem;color:#8896b3;min-width:56px">%Victorias</span>
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+            <div style="width:${win}%;height:100%;background:linear-gradient(to right,#66bb6a,#00e676);border-radius:3px"></div>
+          </div>
+          <span style="font-size:.62rem;color:#66bb6a;min-width:28px;text-align:right">${win}</span>
+        </div>
+      </div>`;
+  };
+
+  // Tarjeta de cada clasificado
+  const cardClasif = og8.map((e, idx) => {
+    const p = perfil(e);
+    const st = statTop(e);
+    const rank = idx+1;
+    const medals = ['🥇','🥈','🥉'];
+    const medalIcon = rank<=3 ? medals[rank-1] : `<span style="font-size:1rem;font-weight:900;color:#8896b3">#${rank}</span>`;
+    const semilla = rank <= 4 ? '🔵 Semi alta' : '🟡 Semi baja';
+
+    return `<div style="background:var(--bg2);border:1px solid ${p.color}44;border-radius:16px;overflow:hidden;position:relative">
+      <!-- Barra superior de color -->
+      <div style="height:4px;background:linear-gradient(to right,${p.color},${p.color}66)"></div>
+
+      <div style="padding:16px">
+        <!-- Header: posición + nombre + perfil -->
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+          <div style="text-align:center;min-width:36px;padding-top:2px">${medalIcon}</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <span style="font-weight:800;font-size:1rem">${e.n}</span>
+              <span style="font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700;
+                background:${p.color}22;color:${p.color};border:1px solid ${p.color}44">
+                ${p.icon} ${p.label}
+              </span>
+            </div>
+            <!-- Titular dramático -->
+            <div style="font-size:.78rem;color:#a0aec0;font-style:italic;line-height:1.4">
+              "${titular(e)}"
+            </div>
+          </div>
+          <!-- Semilla -->
+          <div style="text-align:center;font-size:.65rem;color:#4a5a6a;white-space:nowrap">${semilla}</div>
+        </div>
+
+        <!-- Stats en fila -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+          ${[
+            {v:e.pg+'G-'+e.pp+'P', l:'Record'},
+            {v:(winPct(e)*100).toFixed(0)+'%', l:'Win%'},
+            {v:ptsPJ(e).toFixed(1), l:'PF/J'},
+            {v:pcPJ(e).toFixed(1), l:'PC/J'},
+          ].map(s=>`<div style="background:var(--bg3);border-radius:8px;padding:6px;text-align:center">
+            <div style="font-size:.85rem;font-weight:800;color:var(--text)">${s.v}</div>
+            <div style="font-size:.58rem;color:#4a5a6a;text-transform:uppercase;letter-spacing:.04em">${s.l}</div>
+          </div>`).join('')}
+        </div>
+
+        <!-- Barras de atributos -->
+        ${barraAtrib(e)}
+
+        <!-- Stat más destacada -->
+        <div style="margin-top:8px;padding:7px 10px;background:${p.color}11;border:1px solid ${p.color}33;border-radius:8px;
+          display:flex;align-items:center;gap:8px">
+          <span style="font-size:1rem">⭐</span>
+          <span style="font-size:.72rem;color:#8896b3">
+            <strong style="color:${p.color}">#${st.rank} en la liga</strong> — ${st.label} ${st.desc}
+          </span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Equipos eliminados — tabla compacta
+  const tablaEliminados = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:24px">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.1rem">❌</span>
+        <div>
+          <div style="font-weight:800;font-size:.95rem">Quedaron fuera</div>
+          <div style="font-size:.68rem;color:var(--text2)">Equipos que no clasificaron a los 8 Grandes 2026</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+          <thead>
+            <tr style="background:var(--bg3)">
+              <th style="padding:8px 12px;text-align:left;color:var(--text2);font-size:.65rem;text-transform:uppercase">#</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text2);font-size:.65rem;text-transform:uppercase">Equipo</th>
+              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">Record</th>
+              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">PF/J</th>
+              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">PC/J</th>
+              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">+/-</th>
+              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">Le faltó</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rest.map(e => {
+              // Calcular cuántas victorias le faltaron para clasificar
+              const umbral = og8[og8.length-1].pg; // victorias del último clasificado
+              const faltaron = Math.max(0, umbral - e.pg + 1);
+              const razon = e.pg >= umbral-2
+                ? `${faltaron}G más`
+                : ptsPJ(e) < 70
+                ? 'Más ataque'
+                : pcPJ(e) > 85
+                ? 'Mejorar defensa'
+                : `${faltaron}G más`;
+              return `<tr style="border-bottom:1px solid rgba(30,45,74,.4)">
+                <td style="padding:8px 12px;color:var(--text2)">${e.r}</td>
+                <td style="padding:8px 12px;font-weight:600">${e.n}</td>
+                <td style="padding:8px 12px;text-align:center">${e.pg}G-${e.pp}P</td>
+                <td style="padding:8px 12px;text-align:center;color:${ptsPJ(e)>=80?'#66bb6a':ptsPJ(e)>=70?'#ffd740':'#ef5350'}">${ptsPJ(e).toFixed(1)}</td>
+                <td style="padding:8px 12px;text-align:center;color:${pcPJ(e)<=75?'#66bb6a':pcPJ(e)<=85?'#ffd740':'#ef5350'}">${pcPJ(e).toFixed(1)}</td>
+                <td style="padding:8px 12px;text-align:center;color:${difPJ(e)>=0?'#66bb6a':'#ef5350'}">${difPJ(e)>0?'+':''}${difPJ(e).toFixed(1)}</td>
+                <td style="padding:8px 12px;text-align:center;font-size:.7rem;color:#8896b3">${razon}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  // Stats de la liga completa para contexto
+  const promPF = (data.reduce((s,e)=>s+ptsPJ(e),0)/data.length).toFixed(1);
+  const promPC = (data.reduce((s,e)=>s+pcPJ(e),0)/data.length).toFixed(1);
+  const mejorAtaque  = [...data].sort((a,b)=>ptsPJ(b)-ptsPJ(a))[0];
+  const mejorDefensa = [...data].sort((a,b)=>pcPJ(a)-pcPJ(b))[0];
+  const masGanador   = [...data].sort((a,b)=>b.pg-a.pg)[0];
+
+  const genLabel = currentGenero === 'M' ? 'Varonil' : 'Femenil';
+
+  // Banner de campeón si ya está confirmado
+  const campDatos = CAMPEONES[currentTemporada] ? (currentGenero==='M' ? CAMPEONES[currentTemporada].varonil : CAMPEONES[currentTemporada].femenil) : null;
+  const bannerCampeon = campDatos ? `
+    <div style="background:linear-gradient(135deg,rgba(255,215,64,.15),rgba(255,167,38,.08));border:2px solid #ffd74066;border-radius:16px;padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px">
+      <div style="font-size:2.5rem;line-height:1">🏆</div>
+      <div style="flex:1">
+        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#b8860b;margin-bottom:4px">Campeón 8G 2026 · ${genLabel}</div>
+        <div style="font-size:1.4rem;font-weight:900;color:#ffd740;line-height:1.1">${campDatos.nombre}</div>
+        ${campDatos.subcampeon ? `<div style="font-size:.72rem;color:#8896b3;margin-top:4px">🥈 Subcampeón: ${campDatos.subcampeon}${campDatos.tercero ? ' · 🥉 3°: '+campDatos.tercero : ''}</div>` : ''}
+      </div>
+      <div style="font-size:3rem;opacity:.3">🎊</div>
+    </div>` : currentGenero==='M' ? `
+    <div style="background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.3rem">⏳</span>
+      <div>
+        <div style="font-size:.8rem;font-weight:700;color:var(--cyan)">Gran Final Varonil — HOY 2 mayo · 19:00 hrs</div>
+        <div style="font-size:.7rem;color:#8896b3">Arena Borregos · Tec Puebla · El campeón se define esta noche 🔥</div>
+      </div>
+    </div>` : '';
+
+  return `<div style="padding:4px 0 40px">
+
+    <!-- BANNER CAMPEÓN -->
+    ${bannerCampeon}
+
+    <!-- HEADER -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:1.15rem;font-weight:900;margin-bottom:4px">
+        ⚡ Élite ABE <span style="color:var(--gold)">${genLabel} 2025-26</span>
+      </div>
+      <div style="font-size:.75rem;color:var(--text2)">
+        Análisis de los 8 clasificados · Stats reales de temporada regular · ${data.length} equipos en liga
+      </div>
+    </div>
+
+    <!-- CONTEXTO LIGA -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px">
+      ${[
+        {icon:'🎯', label:'Mejor ataque', val:mejorAtaque.n, sub: ptsPJ(mejorAtaque).toFixed(1)+' pts/J'},
+        {icon:'🛡️', label:'Mejor defensa', val:mejorDefensa.n, sub: pcPJ(mejorDefensa).toFixed(1)+' pts/J'},
+        {icon:'👑', label:'Más victorias', val:masGanador.n, sub: masGanador.pg+'G en temporada'},
+      ].map(s=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:1.4rem;margin-bottom:4px">${s.icon}</div>
+        <div style="font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">${s.label}</div>
+        <div style="font-size:.82rem;font-weight:800;line-height:1.2;margin-bottom:2px">${s.val}</div>
+        <div style="font-size:.68rem;color:var(--gold)">${s.sub}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- GRID 8 CLASIFICADOS -->
+    <div style="font-size:.8rem;font-weight:700;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span>⚡</span> Los 8 que clasificaron — análisis completo
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
+      ${cardClasif}
+    </div>
+
+    ${tablaEliminados}
+
+    <!-- NOTA -->
+    <div style="margin-top:16px;font-size:.68rem;color:#3a4a5a;text-align:center">
+      📊 Todos los datos de temporada regular · Fuente: abemexico.org · Índices normalizados vs. liga completa
+    </div>
+  </div>`;
+}
+
+
+function renderGlosario() {
+  const siglas = [
+    // Stats básicas
+    { t:'PJ', d:'Partidos Jugados — total de partidos que ha disputado el equipo en la temporada regular.' },
+    { t:'PG', d:'Partidos Ganados — victorias acumuladas en la temporada regular.' },
+    { t:'PP', d:'Partidos Perdidos — derrotas acumuladas en la temporada regular.' },
+    { t:'PF', d:'Puntos a Favor — total de puntos que ha anotado el equipo en toda la temporada.' },
+    { t:'PC', d:'Puntos en Contra — total de puntos que le han metido al equipo en toda la temporada.' },
+    { t:'PF/J', d:'Puntos a Favor por Juego — promedio de puntos que anota el equipo por partido. Más alto = mejor ataque.' },
+    { t:'PC/J', d:'Puntos en Contra por Juego — promedio de puntos que le anotan por partido. Más bajo = mejor defensa.' },
+    { t:'+/-', d:'Diferencial de puntos — PF menos PC. Si es positivo, el equipo anota más de lo que recibe.' },
+    { t:'+/-/J', d:'Diferencial por juego — el +/- dividido entre partidos jugados. Indica qué tan dominante es un equipo por partido.' },
+    { t:'%G', d:'Porcentaje de victorias — partidos ganados entre partidos jugados, expresado en porcentaje.' },
+    { t:'Ratio PF/PC', d:'División de puntos anotados entre puntos recibidos. Un ratio mayor a 1.0 significa que el equipo anota más de lo que recibe. Ej: 1.15 = anota 15% más de lo que le meten.' },
+    { t:'Ef. Def', d:'Eficiencia Defensiva — qué porcentaje representan los puntos recibidos vs los que anota el equipo. Menor % = mejor defensa.' },
+    // Ligas y estructura
+    { t:'ABE', d:'Asociación de Basquetbol Estudiantil — liga que organiza el basquetbol universitario en México.' },
+    { t:'DI', d:'División I — la máxima categoría de la Liga ABE. Los mejores 19 equipos varonil y 16 femenil del país.' },
+    { t:'8G', d:'Ocho Grandes — el torneo de playoffs de la ABE. Los 8 mejores equipos de la temporada regular se clasifican y compiten en una sede única para definir al campeón.' },
+    { t:'T. Regular', d:'Temporada Regular — la fase donde todos los equipos se enfrentan entre sí (ida y vuelta). Varonil: 36 juegos. Femenil: 30 juegos.' },
+    // Conferencias
+    { t:'Bajío', d:'Conferencia Bajío-Occidente — agrupa equipos de Jalisco, Querétaro, Puebla, Michoacán y Guanajuato.' },
+    { t:'Centro', d:'Conferencia Centro-Oriente — equipos principalmente de CDMX, Puebla, Veracruz y Estado de México.' },
+    { t:'Norte', d:'Conferencia Norte — equipos del norte del país: Nuevo León (Tec MTY, UANL, CEU), Coahuila, Chihuahua (UACH), Sonora, Baja California (CETYS) y UANE.' },
+    { t:'Sureste', d:'Conferencia Sureste — equipos del sureste mexicano (Mérida, Xalapa y región).' },
+    // Stats avanzadas (Lab y H2H)
+    { t:'Score de Poder', d:'Métrica propia de StatsBi. Promedio ponderado de 5 métricas normalizadas contra toda la liga: 30% victorias + 20% ataque + 20% defensa + 20% diferencial + 10% ratio PF/PC. Escala 0-100.' },
+    { t:'Score Global H2H', d:'En la pestaña H2H: promedio de los 8 ejes del radar para cada equipo, normalizados contra toda la liga. Indica qué tan superior es un equipo en general vs. sus rivales de liga. Escala 0-100.' },
+    { t:'Temperatura', d:'En el Mapa de Poder: representación visual del Score de Poder. Azul = frío (bajo rendimiento), rojo = caliente (alto rendimiento). No tiene que ver con condiciones climáticas.' },
+    { t:'Nivel de Calor', d:'Score del 0 al 100 en la pestaña 8G Llegada. Combina victorias (40%) + diferencial/J (30%) + ataque (15%) + defensa (15%). 🔥 En llamas ≥75 · ⚡ Caliente 60-74 · ✅ Regular 45-59 · ❄️ Fría 30-44 · 🧊 Sin forma <30.' },
+    { t:'Forma Reciente', d:'Pestaña que reemplaza a Rachas. Muestra todos los equipos ordenados por Nivel de Calor — qué tan dominante fue cada equipo en la temporada completa.' },
+    { t:'Índice de Consistencia', d:'Qué tan predecible es un equipo. Win% extremo (muy alto o muy bajo) = consistente. Win% cerca del 50% = impredecible, puede ganarle o perderle a cualquiera.' },
+    { t:'ADN de Juego', d:'Clasificación táctica estimada de cada equipo según sus estadísticas: CAÑÓN (ataca mucho y gana), OFENSIVO, FORTALEZA (defiende y gana), EQUILIBRADO, RESISTENTE o EMERGENTE.' },
+    { t:'Dominancia', d:'Índice del Lab que combina win%, diferencial y eficiencia defensiva para estimar qué tan dominante es un equipo sobre sus rivales.' },
+    { t:'Ritmo', d:'Promedio de puntos por juego de ambos equipos sumados — indica si un partido tiende a ser de alto o bajo puntaje.' },
+    { t:'Momentum', d:'Tendencia reciente del equipo. Basado en los últimos resultados para estimar si el equipo está "en racha" o "cayendo".' },
+  ];
+
+  const pestanas = [
+    { icon:'🏅', name:'Posiciones', desc:'La tabla de clasificación oficial de la temporada, ordenada por victorias. Igual a la que publica ABE. Muestra quién está dentro y fuera de los 8 Grandes.' },
+    { icon:'🌡️', name:'Mapa de Poder', desc:'Vista de calor de todos los equipos. Los ordena del más caliente al más frío según un Score de Poder que combina 5 métricas. De un vistazo ves quién domina la liga y quién está en problemas.' },
+    { icon:'⚔️', name:'H2H (Head to Head)', desc:'Comparador directo entre 2 equipos. Muestra 8 métricas reales con barras, un radar de 8 ejes y un score global para cada equipo. Responde: ¿quién es mejor y en qué aspectos?' },
+    { icon:'🎮', name:'Simulador', desc:'Simula el resultado de un partido entre cualquier par de equipos, basado en sus estadísticas reales de la temporada. Los marcadores se calculan por cuartos con variabilidad realista. Puede haber tiempo extra.' },
+    { icon:'🧠', name:'Análisis IA', desc:'Análisis táctico por equipo generado por inteligencia artificial. Se alimenta con los datos reales del equipo seleccionado y produce un reporte de fortalezas, debilidades y perfil competitivo.' },
+    { icon:'🏆', name:'Bracket', desc:'El cuadro de los Ocho Grandes. Muestra los 8 equipos clasificados y el árbol de eliminación directa. Puedes simular los cruces para proyectar quién podría llegar a la final.' },
+    { icon:'🔮', name:'Predictor', desc:'Herramienta para pronosticar el ganador de un juego antes de que se juegue. Calcula probabilidades basadas en el rendimiento de temporada de ambos equipos.' },
+    { icon:'⚡', name:'Élite', desc:'Análisis profundo de los 8 equipos clasificados a los Ocho Grandes: perfil de juego, stats reales de temporada, barras de ataque y defensa, y el destacado de cada equipo en la liga. También muestra por qué los demás no clasificaron.' },
+    { icon:'📈', name:'Momentum', desc:'Tendencia y dinámica reciente de cada equipo. Va más allá de la racha simple: analiza si el equipo está ascendiendo, estable o cayendo conforme avanza la temporada.' },
+    { icon:'🗳️', name:'Fan Zone', desc:'Espacio de participación para aficionados. Vota por tu equipo favorito para campeón, da tus hot takes y acumula puntos al hacer predicciones correctas.' },
+    { icon:'🔬', name:'Lab', desc:'El laboratorio analítico avanzado de StatsBi. Muestra rankings de dominancia, ritmo de juego, índice de consistencia y eficiencia relativa para cada equipo. Para los que quieren ir más profundo que las estadísticas básicas.' },
+  ];
+
+  const sSection = (icon, title, sub, content) => `
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:1.3rem">${icon}</span>
+        <div>
+          <div style="font-size:1rem;font-weight:800;color:var(--cyan)">${title}</div>
+          <div style="font-size:.72rem;color:var(--text2)">${sub}</div>
+        </div>
+      </div>
+      ${content}
+    </div>`;
+
+  const siglaCards = siglas.map(s => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start">
+      <div style="color:var(--gold);font-weight:900;font-size:.88rem;min-width:90px;padding-top:1px;font-family:monospace">${s.t}</div>
+      <div style="color:#a0aec0;font-size:.82rem;line-height:1.5">${s.d}</div>
+    </div>`).join('');
+
+  const tabCards = pestanas.map(p => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+      <div style="font-size:1.4rem;line-height:1;padding-top:2px">${p.icon}</div>
+      <div>
+        <div style="font-weight:800;font-size:.88rem;color:var(--text);margin-bottom:4px">${p.name}</div>
+        <div style="color:#8896b3;font-size:.8rem;line-height:1.55">${p.desc}</div>
+      </div>
+    </div>`).join('');
+
+  return `<div style="padding:4px 0 40px">
+    ${sSection('📖', 'Siglas y Términos', 'Qué significa cada abreviación que ves en StatsBi', `
+      <div style="display:flex;flex-direction:column;gap:7px">${siglaCards}</div>
+    `)}
+    ${sSection('🗺️', 'Guía de Pestañas', 'Para qué sirve cada sección y cuándo usarla', `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">${tabCards}</div>
+    `)}
+    <div style="background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(255,215,64,.05));border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:18px 20px;margin-top:8px">
+      <div style="font-size:.85rem;font-weight:700;color:var(--cyan);margin-bottom:8px">💡 ¿Diferencia entre Momentum y Rachas?</div>
+      <div style="font-size:.8rem;color:#8896b3;line-height:1.6">
+        <strong style="color:var(--text)">Rachas</strong> es simple: cuántos seguidos ganaste o perdiste. Si ganaste 4 seguidos, tu racha es +4.<br>
+        <strong style="color:var(--text)">Momentum</strong> analiza la tendencia más amplia: ¿estás mejorando, estabilizado o cayendo? Considera los últimos juegos pero también el patrón general de la temporada.
+      </div>
+    </div>
+  </div>`;
+}
+
+
+// ============================================================
+// MODALS
+// ============================================================
+function closeWelcome() {
+  const overlay = document.getElementById('welcomeOverlay');
+  if (overlay) overlay.style.display = 'none';
+  if (typeof renderContent === 'function') renderContent();
+  else setTimeout(() => initSupabase(10), 200);
+}
+function openAuth() { document.getElementById('authOverlay').classList.add('active'); }
+function closeAuth() { document.getElementById('authOverlay').classList.remove('active'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabRegistro').classList.toggle('active', tab==='registro');
+  document.getElementById('formLogin').style.display = tab==='login'?'':'none';
+  document.getElementById('formRegistro').style.display = tab==='registro'?'':'none';
+}
+
+const legalTexts = {
+  terminos: `<h3>Términos y Condiciones</h3>
+    <p><span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> es una plataforma de análisis deportivo educativo para la Liga ABE México. El uso de este sitio implica la aceptación de estos términos.</p>
+    <p><strong>Uso del servicio:</strong> <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> proporciona análisis estadísticos con fines informativos. Los datos son obtenidos de fuentes públicas, principalmente abemexico.org.</p>
+    <p><strong>Cuentas:</strong> Al registrarte, eres responsable de mantener la confidencialidad de tu contraseña. Prohibido usar la plataforma para actividades ilegales.</p>
+    <p><strong>Propiedad intelectual:</strong> Todo el contenido, diseño y código de <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> pertenece a HoopLink. Los datos de la Liga ABE son propiedad de la Asociación de Basquetbol Estudiantil.</p>
+    <p><strong>Limitación de responsabilidad:</strong> <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> no garantiza la exactitud de los datos en tiempo real. Para datos oficiales, consulta abemexico.org.</p>`,
+  privacidad: `<h3>Aviso de Privacidad</h3>
+    <p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP), <span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> by HoopLink informa:</p>
+    <p><strong>Datos recopilados:</strong> Nombre, correo electrónico, fecha de nacimiento, género y preferencias deportivas al registrarte.</p>
+    <p><strong>Finalidad:</strong> Personalizar tu experiencia, mostrar estadísticas relevantes y comunicarte novedades de la Liga ABE.</p>
+    <p><strong>Protección:</strong> Tus datos se almacenan de forma segura en Supabase con encriptación. No vendemos ni compartimos tu información con terceros.</p>
+    <p><strong>Derechos ARCO:</strong> Puedes ejercer tus derechos de Acceso, Rectificación, Cancelación u Oposición escribiendo a privacidad@statsbi.mx.</p>
+    <p><strong>Responsable:</strong> HoopLink · Monterrey, Nuevo León, México</p>`,
+  contacto: `<h3>Contacto</h3>
+    <p><strong>General:</strong> hola@statsbi.mx</p>
+    <p><strong>Datos y estadísticas:</strong> datos@statsbi.mx</p>
+    <p><strong>Negocios y patrocinios:</strong> negocios@statsbi.mx</p>
+    <p><strong>Soporte técnico:</strong> soporte@statsbi.mx</p>
+    <p><strong>Privacidad:</strong> privacidad@statsbi.mx</p>
+    <p style="margin-top:16px;color:#8896b3">HoopLink · Monterrey, N.L., México · © 2026</p>`
+};
+
+function showLegal(tipo) {
+  document.getElementById('legalContent').innerHTML = legalTexts[tipo] || '';
+  document.getElementById('legalOverlay').classList.add('active');
+}
+function closeLegal() { document.getElementById('legalOverlay').classList.remove('active'); }
+
+// ============================================================
+// INIT
+// ============================================================
+// Equipos: usar siempre datos hardcoded reales de ABE (tabla Supabase tiene datos incompletos)
+// Cuando Make.com esté configurado y la tabla tenga los 19 equipos completos, reactivar
+async function loadEquiposFromSupabase() {
+  // DESACTIVADO: la tabla 'equipos' en Supabase tiene solo 3 registros incompletos
+  // Los datos reales están en VARONIL y FEMENIL (leídos de abemexico.org directamente)
+  window.VARONIL_LIVE = null;
+  window.FEMENIL_LIVE = null;
+  renderContent();
+}
+
+
+// Usar datos live si están, si no usar hardcoded o histórico
+function getEquipos(genero) {
+  // Si es temporada actual, usar live o hardcoded
+  if (currentTemporada === '2025-26') {
+    if (genero === 'M' && window.VARONIL_LIVE && window.VARONIL_LIVE.length > 0) return window.VARONIL_LIVE;
+    if (genero === 'F' && window.FEMENIL_LIVE && window.FEMENIL_LIVE.length > 0) return window.FEMENIL_LIVE;
+    return genero === 'M' ? VARONIL : FEMENIL;
+  }
+  // Temporadas históricas
+  const hist = TEMPORADAS[currentTemporada];
+  if (hist) return genero === 'M' ? hist.varonil : hist.femenil;
+  return genero === 'M' ? VARONIL : FEMENIL;
+}
+
+// ── BADGE ÚLTIMA SINCRONIZACIÓN ─────────────────────────────
+async function checkSyncBadge() {
+  const badge = document.getElementById('syncBadge');
+  if (!badge) return;
+  try {
+    const { data } = await supabase
+      .from('equipos')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    if (data && data[0] && data[0].updated_at) {
+      const dt = new Date(data[0].updated_at);
+      const ahora = new Date();
+      const diffH = Math.floor((ahora - dt) / 3600000);
+      const diffD = Math.floor(diffH / 24);
+      const hora = dt.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+      const fecha = dt.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+      if (diffH < 24) {
+        badge.textContent = `✅ Sync hoy ${hora}`;
+        badge.style.color = '#00e676';
+      } else if (diffD === 1) {
+        badge.textContent = `🟡 Sync ayer ${hora}`;
+        badge.style.color = '#ffd740';
+      } else {
+        badge.textContent = `📊 Sync ${fecha}`;
+        badge.style.color = '#8896b3';
+      }
+    } else {
+      badge.textContent = '📊 Datos 2025-26';
+      badge.style.color = '#8896b3';
+    }
+  } catch(e) {
+    badge.textContent = '📊 Datos 2025-26';
+    badge.style.color = '#8896b3';
+  }
+}
+
+// Init inmediato — no esperar al evento load
+function initApp() {
+  initTicker();
+  updateOG();
+  renderContent();
+  setTimeout(loadVisitas, 500);
+  setTimeout(checkSyncBadge, 1200);
+  setInterval(updateOG, 3600000);
+  loadEquiposFromSupabase();
+  supabase.auth.getSession().then(({data:{session}}) => {
+    if (session?.user) {
+      currentUser = session.user;
+      isLoggedIn = true;
+      updateAuthUI();
+      renderContent();
+    }
+  });
+}
+
+// Inicializar Supabase con retry hasta que el SDK esté disponible
+function initSupabase(retries) {
+  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // Usuario llegó del link de recuperación — mostrar formulario de nueva contraseña
+        document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+        document.querySelectorAll('.auth-tab-btn').forEach(b => b.style.opacity = '.4');
+        document.getElementById('formReset').style.display = 'block';
+        openAuth();
+        return;
+      }
+      if (session?.user) {
+        currentUser = session.user; isLoggedIn = true; updateAuthUI();
+        ['lockH2H','lockSim','lockAI','lockMom','lockFan'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        // Si venía de un reset, cerrar el modal
+        const resetForm = document.getElementById('formReset');
+        if (resetForm && resetForm.style.display !== 'none') {
+          closeAuth();
+        }
+      } else {
+        currentUser = null; isLoggedIn = false; updateAuthUI();
+      }
+    });
+    initApp();
+  } else if (retries > 0) {
+    setTimeout(() => initSupabase(retries - 1), 150);
+  } else {
+    console.error('Supabase SDK no cargó');
+  }
+}
+
+// Arrancar — el script está al final del body, DOM ya está listo
+// Usar setTimeout para dar tiempo al SDK de Supabase de inicializar
+setTimeout(() => initSupabase(30), 100);
+// Backup con window.onload
+window.addEventListener('load', () => {
+  if (typeof supabase === 'undefined' || !supabase) {
+    initSupabase(20);
+  }
+});
+</script>
+
+
+</body>
+</html>

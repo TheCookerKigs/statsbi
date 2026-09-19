@@ -637,7 +637,7 @@
       <select id="temporadaSelect" onchange="switchTemporada(this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--cyan);padding:6px 12px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;outline:none">
         <option value="2026-27" selected>2026-27 (Actual)</option>
         <option value="2025-26">2025-26</option>
-        <option value="2024-25">2024-25</option>
+        
       </select>
     </div>
   </div>
@@ -691,47 +691,6 @@ var CAMPEONES = {
   '2025-26': {
     femenil: { nombre: 'Tec CEM', emoji: '🏆', subcampeon: 'Tec Monterrey', tercero: 'Tec Toluca' },
     varonil:  { nombre: 'Tec Toluca', emoji: '🏆', subcampeon: 'UPAEP Águilas', tercero: 'Anáhuac Querétaro' }
-  },
-  '2024-25': {
-    varonil:  { nombre: 'Tec Santa Fe', emoji: '🏆', subcampeon: 'UMAD Tigres Blancos' },
-    femenil:  { nombre: 'Tec Monterrey', emoji: '🏆', subcampeon: 'UANL Tigras' }
-  }
-};
-
-var TEMPORADAS = {
-  '2025-26': {
-    varonil: [
-      {r:1,n:'Tec Santa Fe',c:'Centro',pg:29,pp:7,pj:36,pf:3241,pc:2814},
-      {r:2,n:'Anáhuac Querétaro',c:'Bajío',pg:29,pp:7,pj:36,pf:3070,pc:2696},
-      {r:3,n:'Tec Toluca',c:'Centro',pg:29,pp:7,pj:36,pf:2964,pc:2611},
-      {r:4,n:'UMAD',c:'Centro',pg:28,pp:8,pj:36,pf:2686,pc:2266},
-      {r:5,n:'UPAEP',c:'Bajío',pg:24,pp:12,pj:36,pf:2450,pc:2280},
-      {r:6,n:'Halcones Inter',c:'Centro',pg:20,pp:16,pj:36,pf:2200,pc:2100},
-      {r:7,n:'UANL',c:'Norte',pg:19,pp:17,pj:36,pf:2100,pc:2050},
-      {r:8,n:'Tec Puebla',c:'Centro',pg:19,pp:17,pj:36,pf:2050,pc:2000},
-      {r:9,n:'Tec Monterrey',c:'Norte',pg:18,pp:18,pj:36,pf:2000,pc:1980},
-      {r:10,n:'UDLAP',c:'Bajío',pg:19,pp:17,pj:36,pf:2473,pc:2458},
-      {r:11,n:'Gallos CEU',c:'Centro',pg:18,pp:18,pj:36,pf:2983,pc:2810},
-      {r:12,n:'Montrer',c:'Bajío',pg:18,pp:18,pj:36,pf:2795,pc:2802},
-      {r:13,n:'Anáhuac Xalapa',c:'Centro',pg:13,pp:23,pj:36,pf:2562,pc:2776},
-      {r:14,n:'Tec Guadalajara',c:'Bajío',pg:9,pp:27,pj:36,pf:2464,pc:2775},
-      {r:15,n:'UP CDMX',c:'Centro',pg:9,pp:27,pj:36,pf:2543,pc:2817},
-      {r:16,n:'CETYS',c:'Norte',pg:7,pp:29,pj:36,pf:2313,pc:2680},
-      {r:17,n:'UANE',c:'Norte',pg:6,pp:30,pj:36,pf:2100,pc:2600},
-      {r:18,n:'Tec Hidalgo',c:'Centro',pg:5,pp:31,pj:36,pf:2699,pc:3263},
-      {r:19,n:'UACH',c:'Norte',pg:4,pp:32,pj:36,pf:2522,pc:2935}
-    ],
-    femenil: [
-      {r:1,n:'Tec Monterrey F',c:'Norte',pg:28,pp:2,pj:30,pf:2029,pc:1527},
-      {r:2,n:'Tec CEM F',c:'Centro',pg:26,pp:4,pj:30,pf:2347,pc:1648},
-      {r:3,n:'Tec Toluca F',c:'Centro',pg:25,pp:5,pj:30,pf:2100,pc:1800},
-      {r:4,n:'Tec Guadalajara F',c:'Bajío',pg:20,pp:10,pj:30,pf:1900,pc:1750},
-      {r:5,n:'UANL F',c:'Norte',pg:18,pp:12,pj:30,pf:1800,pc:1700}
-    ],
-    campeon_varonil: 'Tec Toluca',
-    campeon_femenil: 'Tec CEM',
-    og_varonil: 'Tec Santa Fe',
-    og_femenil: 'Tec Monterrey'
   },
   '2024-25': {
     varonil: [

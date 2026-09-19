@@ -990,10 +990,10 @@ function initTicker() {
 // OG COUNTDOWN
 // ============================================================
 function updateOG() {
-  // OG 2026: 26 Abr - 2 May (hora CST = UTC-6)
-  const ogStart = new Date('2026-04-26T06:00:00Z');
-  const ogEnd   = new Date('2026-05-03T06:00:00Z');
-  const finalDay = new Date('2026-05-02T06:00:00Z'); // Día de la final
+  // OG 2026-27: fecha tentativa Abril 2027 (por confirmar ABE)
+  const ogStart = new Date('2027-04-12T06:00:00Z');
+  const ogEnd   = new Date('2027-04-19T06:00:00Z');
+  const finalDay = new Date('2027-04-18T06:00:00Z');
   const now = new Date();
   const el = document.getElementById('stats8GDia');
   if (!el) return;
@@ -1077,7 +1077,7 @@ function renderContent() {
     if (temporadaFinalizada) {
       jornadaEl.textContent = totalJornadas + ' / ' + totalJornadas;
       jornadaEl.style.color = '#00e676';
-      if (noteEl) noteEl.textContent = '✅ T. Regular finalizada';
+      if (noteEl) noteEl.textContent = 'Temporada Regular';
     } else {
       jornadaEl.textContent = maxPjDatos + ' / ' + totalJornadas;
       jornadaEl.style.color = 'var(--cyan)';

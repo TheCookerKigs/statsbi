@@ -635,7 +635,8 @@
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-size:.8rem;color:var(--text2)">📅 Temporada:</span>
       <select id="temporadaSelect" onchange="switchTemporada(this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--cyan);padding:6px 12px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;outline:none">
-        <option value="2025-26" selected>2025-26 (Actual)</option>
+        <option value="2026-27" selected>2026-27 (Actual)</option>
+        <option value="2025-26">2025-26</option>
         <option value="2024-25">2024-25</option>
       </select>
     </div>
@@ -932,25 +933,14 @@ async function loadVisitas() {
 // ============================================================
 function initTicker() {
   const noticias = [
-    '🏆 Tec Toluca · CAMPEONES 8G 2026 Varonil · 68-60 vs UPAEP · ¡Primer título!',
-    '🏆 Tec CEM · CAMPEONAS 8G 2026 Femenil · 63-58 vs Tec Monterrey · ¡Primer título!',
-    '🥈 UPAEP Águilas · Subcampeones varonil 8G 2026',
-    '🥈 Tec Monterrey · Subcampeonas femenil 8G 2026',
-    '🥉 Anáhuac Querétaro · 3er lugar varonil · Mejor temporada regular',
-    '🥉 Tec Toluca F · 3er lugar femenil · 78-58 vs Tec Guadalajara',
-    'Anáhuac Querétaro · 29-7 · 1° varonil 2025-26',
-    'Tec Santa Fe · 29-7 · 2° varonil · Campeón defensor',
-    'UMAD Tigres Blancos · 28-8 · 4° varonil · Campeón 2023 y 2024',
-    'Top 8G varonil: Anáhuac Qro · Tec SF · Tec Toluca · UMAD · UPAEP · Inter · UANL · Tec Puebla',
-    'Top 8G femenil: Tec MTY · Tec CEM · Tec Toluca · Tec Gdl · UANL · CETYS · UPAEP · Tec Hidalgo',
-    'Liga ABE DI 2026-27 · 19 equipos varonil · 16 femenil',
-    'Borregos Monterrey · Tricampeonas femenil 2025 · A defender el trono',
-    'Tec Santa Fe venció a UMAD en la final 2025 · 60-58',
-    'Análisis IA disponible · Regístrate gratis en statsbi.mx',
-    'Datos de abemexico.org + vivabasquet.com + nbm.com.mx',
-    'statsbi.mx · Basketball Intelligence by HoopLink',
-    'Ocho Grandes 2026 · Transmisión por AYM Sports y live.tec',
-    'H2H · Simulador · Análisis AI · Inicia sesión para desbloquear',
+    '🏀 Temporada 2026-27 en marcha · Liga ABE División I · 19 equipos varonil · 15 femenil',
+    '🔥 Jornada 1 Varonil: Tec Puebla 86-61 UANE · Tec Monterrey 78-56 Tec Toluca',
+    '✅ Jornada 1: UPAEP 95-74 CETYS · Interamericana 85-72 UMAD · CEU 77-69 UDLAP',
+    '🦁 Jornada 1: Anáhuac Xalapa 74-63 UACJ · Montrer 80-72 Tec Guadalajara',
+    '🏆 Campeones 2025-26: Tec Toluca (Varonil) · Tec CEM (Femenil)',
+    '⭐ Bienvenida a los equipos nuevos: UV · UACJ · Interamericana en División I 2026-27',
+    '🤖 Análisis AI disponible · Estadísticas en tiempo real · statsbi.mx',
+    '📊 StatsBi · Basketball Intelligence by HoopLink · Liga ABE México'
   ];
   const el = document.getElementById('tickerInner');
   if (!el) return;
@@ -1044,7 +1034,7 @@ function renderContent() {
   const noteEl = document.getElementById('jornadaNote');
 
   // Regla: si ya empezaron los 8G → temporada regular finalizada
-  const og8Started = new Date() >= new Date('2026-04-26');
+  const og8Started = new Date() >= new Date('2027-04-01');
   // También si todos los equipos ya completaron sus partidos esperados
   const maxPjDatos = Math.max(...data.map(e => e.pj));
   const temporadaFinalizada = og8Started || maxPjDatos >= totalJornadas;

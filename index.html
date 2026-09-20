@@ -920,17 +920,19 @@ async function handleLogout() {
 // VISITAS
 // ============================================================
 async function loadVisitas() {
-  // Usar counterapi.dev — gratis, sin cuenta, nunca se pausa
-  fetch('https://api.counterapi.dev/v1/statsbi-mx/visits/up')
+  // hits.sh — contador gratuito, sin cuenta, nunca se pausa
+  // Usamos un contador por día basado en la fecha
+  const today = new Date().toISOString().split('T')[0];
+  const namespace = 'statsbi-mx-' + today;
+  fetch(`https://hits.sh/${namespace}.json`)
     .then(r => r.json())
-    .then(data => {
+    .then(d => {
       const badge = document.getElementById('visitsBadge');
-      if (badge && data.count) {
-        badge.textContent = `● ${data.count.toLocaleString()} visitas hoy`;
+      if (badge && d.value !== undefined) {
+        badge.textContent = `● ${Number(d.value).toLocaleString()} visitas hoy`;
       }
     })
     .catch(() => {
-      // Silencioso si falla
       const badge = document.getElementById('visitsBadge');
       if (badge) badge.textContent = '';
     });

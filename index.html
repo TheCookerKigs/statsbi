@@ -920,27 +920,25 @@ async function handleLogout() {
 // VISITAS
 // ============================================================
 async function loadVisitas() {
-  // Contador usando Supabase visitas — si falla, ocultar silenciosamente
-  const today = new Date().toISOString().split('T')[0];
   if (!supabase) return;
-  supabase.from('visitas').select('contador').eq('fecha', today).single()
+  const today = new Date().toISOString().split('T')[0];
+  const badge = document.getElementById('visitsBadge');
+  // Buscar registro de hoy
+  supabase.from('visitas').select('id,contador').eq('fecha', today)
     .then(({ data, error }) => {
-      const badge = document.getElementById('visitsBadge');
-      if (!badge) return;
-      if (error || !data) {
-        // Crear registro del día
-        supabase.from('visitas').upsert({ fecha: today, contador: 1 }, { onConflict: 'fecha' })
-          .then(() => { badge.textContent = '● 1 visitas hoy'; });
+      if (error) { if (badge) badge.textContent = ''; return; }
+      if (data && data.length > 0) {
+        // Actualizar contador
+        const nuevo = data[0].contador + 1;
+        supabase.from('visitas').update({ contador: nuevo }).eq('fecha', today);
+        if (badge) badge.textContent = `● ${nuevo} visitas hoy`;
       } else {
-        const nuevo = (data.contador || 0) + 1;
-        supabase.from('visitas').update({ contador: nuevo }).eq('fecha', today)
-          .then(() => { badge.textContent = `● ${nuevo} visitas hoy`; });
+        // Insertar nuevo día
+        supabase.from('visitas').insert({ fecha: today, contador: 1 });
+        if (badge) badge.textContent = '● 1 visitas hoy';
       }
     })
-    .catch(() => {
-      const badge = document.getElementById('visitsBadge');
-      if (badge) badge.textContent = '';
-    });
+    .catch(() => { if (badge) badge.textContent = ''; });
 }
 
 

@@ -920,26 +920,22 @@ async function handleLogout() {
 // VISITAS
 // ============================================================
 async function loadVisitas() {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const url = `${SUPABASE_URL}/rest/v1/visitas?fecha=eq.${today}`;
-    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
-    // Leer
-    const res = await fetch(url, { headers });
-    const data = await res.json();
-    const badge = document.getElementById('visitsBadge');
-    if (data && data.length > 0) {
-      const nuevoCont = data[0].contador + 1;
-      badge.textContent = `● ${nuevoCont} visitas hoy`;
-      await fetch(url, { method: 'PATCH', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ contador: nuevoCont }) });
-    } else {
-      badge.textContent = '● 1 visita hoy';
-      await fetch(`${SUPABASE_URL}/rest/v1/visitas`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ contador: 1, fecha: today }) });
-    }
-  } catch(e) {
-    document.getElementById('visitsBadge').textContent = '● visitas hoy';
-  }
+  // Usar counterapi.dev — gratis, sin cuenta, nunca se pausa
+  fetch('https://api.counterapi.dev/v1/statsbi-mx/visits/up')
+    .then(r => r.json())
+    .then(data => {
+      const badge = document.getElementById('visitsBadge');
+      if (badge && data.count) {
+        badge.textContent = `● ${data.count.toLocaleString()} visitas hoy`;
+      }
+    })
+    .catch(() => {
+      // Silencioso si falla
+      const badge = document.getElementById('visitsBadge');
+      if (badge) badge.textContent = '';
+    });
 }
+
 
 // ============================================================
 // TICKER

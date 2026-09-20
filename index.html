@@ -976,15 +976,19 @@ async function loadVisitas() {
   if (typeof supabase === 'undefined') return;
   const today = new Date().toISOString().split('T')[0];
   const badge = document.getElementById('visitsBadge');
-  supabase.rpc('increment_visita', { dia: today })
-    .then(({ data, error }) => {
-      if (badge) {
-        if (!error && data) {
-          badge.textContent = `● ${data} visitas hoy`;
+  supabase.from('visitas').select('id,contador').eq('fecha', today)
+    .then(async ({ data, error }) => {
+      if (error) { if (badge) badge.textContent = ''; return; }
+      try {
+        if (data && data.length > 0) {
+          const nuevo = data[0].contador + 1;
+          await supabase.from('visitas').update({ contador: nuevo }).eq('id', data[0].id);
+          if (badge) badge.textContent = `● ${nuevo} visitas hoy`;
         } else {
-          badge.textContent = '';
+          await supabase.from('visitas').insert({ fecha: today, contador: 1 });
+          if (badge) badge.textContent = '● 1 visitas hoy';
         }
-      }
+      } catch(e) { if (badge) badge.textContent = ''; }
     })
     .catch(() => { if (badge) badge.textContent = ''; });
 }

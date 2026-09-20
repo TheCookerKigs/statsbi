@@ -140,7 +140,7 @@
     /* TABS */
     .tabs-wrapper { padding: 0 20px; max-width: 1400px; margin: 0 auto; }
     .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-    .tab { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: .2s; position: relative; display: flex; align-items: center; gap: 6px; }
+    .tab { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: .9rem; transition: .2s; position: relative; display: flex; align-items: center; gap: 6px; }
     .tab.active { background: var(--cyan); color: #000; border-color: var(--cyan); font-weight: 700; }
     .tab:hover:not(.active) { border-color: var(--cyan); color: var(--cyan); }
     .tab .lock-icon { font-size: .75rem; opacity: .7; }
@@ -154,6 +154,12 @@
     .content { padding: 0 20px 40px; max-width: 1400px; margin: 0 auto; }
     .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; }
+    @media(max-width:480px) {
+      .col-conf { display: none; }
+      .stat-card { padding: 10px; }
+      .stat-value { font-size: 1.4rem; }
+      .tabs { gap: 4px; }
+    }
     thead { background: var(--bg3); }
     th { padding: 12px 16px; text-align: left; font-size: .8rem; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
     td { padding: 12px 16px; border-top: 1px solid var(--border); font-size: .9rem; white-space: nowrap; }
@@ -279,6 +285,8 @@
 
     @media(max-width:768px) {
       .stats-bar { grid-template-columns: repeat(2,1fr); }
+      .tab { padding: 7px 10px; font-size: .8rem; }
+      .gender-tab { padding: 8px 16px; font-size: .85rem; }
       .h2h-grid { grid-template-columns: 1fr; }
       .h2h-selectors { grid-template-columns: 1fr; }
       .sim-selectors { grid-template-columns: 1fr; }
@@ -648,6 +656,21 @@
   <!-- se llena dinámicamente -->
 </div>
 
+<!-- BANNER HOOPLINK -->
+<div style="background:linear-gradient(135deg,#0a0f1e,#0d1428);border-top:1px solid rgba(0,229,255,.15);border-bottom:1px solid rgba(0,229,255,.15);padding:20px;text-align:center;margin-top:8px">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="font-size:.75rem;color:#8896b3;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">También de HoopLink</div>
+    <a href="https://hooplink.mx" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:12px 20px;transition:.2s">
+      <span style="font-size:1.5rem">🏀</span>
+      <div style="text-align:left">
+        <div style="color:#00e5ff;font-weight:800;font-size:1rem">HoopLink.mx</div>
+        <div style="color:#8896b3;font-size:.75rem">Conecta con scouts y equipos · Plataforma de scouting universitario</div>
+      </div>
+      <span style="color:#00e5ff;font-size:1.2rem">→</span>
+    </a>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-links">
@@ -752,20 +775,20 @@ var VARONIL = [
   {r:18,n:'UP México',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
   {r:19,n:'UV',c:'Sur',pg:0,pp:0,pj:0,pf:0,pc:0}
 ];var FEMENIL = [
-  {r:1,n:'CETYS Tijuana F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:2,n:'Tec CEM F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:3,n:'Tec Guadalajara F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:4,n:'Tec Hidalgo F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:5,n:'Tec Monterrey F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:6,n:'Tec Toluca F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:1,n:'UANL F',c:'Norte',pg:1,pp:0,pj:1,pf:79,pc:35},
+  {r:2,n:'CETYS Tijuana F',c:'Norte',pg:1,pp:0,pj:1,pf:89,pc:60},
+  {r:3,n:'Interamericana F',c:'Centro',pg:1,pp:0,pj:1,pf:65,pc:57},
+  {r:4,n:'Tec Guadalajara F',c:'Bajío',pg:0,pp:1,pj:1,pf:57,pc:65},
+  {r:5,n:'UPAEP F',c:'Bajío',pg:0,pp:1,pj:1,pf:60,pc:89},
+  {r:6,n:'Anáhuac Sur F',c:'Centro',pg:0,pp:1,pj:1,pf:35,pc:79},
   {r:7,n:'Anáhuac Norte F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:8,n:'Anáhuac Sur F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:9,n:'UANL F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:10,n:'UDLAP F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:11,n:'UDEM F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:12,n:'Interamericana F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:13,n:'Modelo de Mérida F',c:'Sureste',pg:0,pp:0,pj:0,pf:0,pc:0},
-  {r:14,n:'UPAEP F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:8,n:'UDEM F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:9,n:'UDLAP F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:10,n:'Tec CEM F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:11,n:'Tec Hidalgo F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:12,n:'Tec Monterrey F',c:'Norte',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:13,n:'Tec Toluca F',c:'Centro',pg:0,pp:0,pj:0,pf:0,pc:0},
+  {r:14,n:'Modelo de Mérida F',c:'Sureste',pg:0,pp:0,pj:0,pf:0,pc:0},
   {r:15,n:'UVAQ F',c:'Bajío',pg:0,pp:0,pj:0,pf:0,pc:0}
 ];
 
@@ -930,7 +953,7 @@ function initTicker() {
     '🏆 Campeones 2025-26: Tec Toluca (Varonil) · Tec CEM (Femenil)',
     '⭐ Bienvenida a los equipos nuevos: UV · UACJ · Interamericana en División I 2026-27',
     '🤖 Análisis AI disponible · Estadísticas en tiempo real · statsbi.mx',
-    '📊 StatsBi · Basketball Intelligence by HoopLink · Liga ABE México'
+    '📊 StatsBi · Basketball Intelligence by HoopLink · Liga ABE México', '🔗 ¿Eres jugador universitario? Regístrate en HoopLink.mx · Conecta con scouts y equipos'
   ];
   const el = document.getElementById('tickerInner');
   if (!el) return;

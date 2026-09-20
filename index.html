@@ -920,16 +920,21 @@ async function handleLogout() {
 // VISITAS
 // ============================================================
 async function loadVisitas() {
-  // hits.sh — contador gratuito, sin cuenta, nunca se pausa
-  // Usamos un contador por día basado en la fecha
+  // Contador usando Supabase visitas — si falla, ocultar silenciosamente
   const today = new Date().toISOString().split('T')[0];
-  const namespace = 'statsbi-mx-' + today;
-  fetch(`https://hits.sh/${namespace}.json`)
-    .then(r => r.json())
-    .then(d => {
+  if (!supabase) return;
+  supabase.from('visitas').select('contador').eq('fecha', today).single()
+    .then(({ data, error }) => {
       const badge = document.getElementById('visitsBadge');
-      if (badge && d.value !== undefined) {
-        badge.textContent = `● ${Number(d.value).toLocaleString()} visitas hoy`;
+      if (!badge) return;
+      if (error || !data) {
+        // Crear registro del día
+        supabase.from('visitas').upsert({ fecha: today, contador: 1 }, { onConflict: 'fecha' })
+          .then(() => { badge.textContent = '● 1 visitas hoy'; });
+      } else {
+        const nuevo = (data.contador || 0) + 1;
+        supabase.from('visitas').update({ contador: nuevo }).eq('fecha', today)
+          .then(() => { badge.textContent = `● ${nuevo} visitas hoy`; });
       }
     })
     .catch(() => {

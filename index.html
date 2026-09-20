@@ -973,22 +973,17 @@ async function handleLogout() {
 // VISITAS
 // ============================================================
 async function loadVisitas() {
-  if (!supabase) return;
+  if (typeof supabase === 'undefined') return;
   const today = new Date().toISOString().split('T')[0];
   const badge = document.getElementById('visitsBadge');
-  // Buscar registro de hoy
-  supabase.from('visitas').select('id,contador').eq('fecha', today)
+  supabase.rpc('increment_visita', { dia: today })
     .then(({ data, error }) => {
-      if (error) { if (badge) badge.textContent = ''; return; }
-      if (data && data.length > 0) {
-        // Actualizar contador
-        const nuevo = data[0].contador + 1;
-        supabase.from('visitas').update({ contador: nuevo }).eq('fecha', today);
-        if (badge) badge.textContent = `● ${nuevo} visitas hoy`;
-      } else {
-        // Insertar nuevo día
-        supabase.from('visitas').insert({ fecha: today, contador: 1 });
-        if (badge) badge.textContent = '● 1 visitas hoy';
+      if (badge) {
+        if (!error && data) {
+          badge.textContent = `● ${data} visitas hoy`;
+        } else {
+          badge.textContent = '';
+        }
       }
     })
     .catch(() => { if (badge) badge.textContent = ''; });

@@ -2596,8 +2596,8 @@ function initLab(data) {
   const minPts   = Math.min(...data.map(e=>(e.pj>0?e.pf/e.pj:0)));
   const maxDef   = Math.max(...data.map(e=>(e.pj>0?e.pc/e.pj:0)));
   const minDef   = Math.min(...data.map(e=>(e.pj>0?e.pc/e.pj:0)));
-  const maxDifN  = Math.max(...data.map(e=>(e.pf-e.pc)/e.pj));
-  const minDifN  = Math.min(...data.map(e=>(e.pf-e.pc)/e.pj));
+  const maxDifN  = Math.max(...data.map(e=>e.pj>0?(e.pf-e.pc)/e.pj:0));
+  const minDifN  = Math.min(...data.map(e=>e.pj>0?(e.pf-e.pc)/e.pj:0));
   const rngDif   = maxDifN - minDifN || 1;
 
   const teams = data.map(e => {

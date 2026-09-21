@@ -1208,6 +1208,7 @@ function renderPosiciones(data) {
 // MAPA CALOR
 // ============================================================
 function renderCalor(data) {
+  const sinJugar = data.filter(e => e && e.pj === 0);
   data = data.filter(e => e && e.pj > 0);
   // Normalizar 0-1 contra toda la liga
   const norm = (val, arr) => {
@@ -1313,7 +1314,7 @@ function renderCalor(data) {
   return `
     <div class="poder-header">
       <div>
-        <div style="font-size:1.05rem;font-weight:800">🌡️ Mapa de Poder <span style="color:var(--gold)">ABE 2025-26</span></div>
+        <div style="font-size:1.05rem;font-weight:800">🌡️ Mapa de Poder <span style="color:var(--gold)">ABE ${currentTemporada}</span></div>
         <div style="font-size:.7rem;color:var(--text2);margin-top:3px">Score 0-100 basado en victorias, ataque, defensa y diferencial · Todos los equipos</div>
       </div>
       <div class="poder-legend">

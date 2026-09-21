@@ -2882,16 +2882,16 @@ function renderPredictor(data) {
 // RACHAS
 // ============================================================
 function renderRachas(data) {
-  // Solo equipos que han jugado al menos 1 partido
-  const jugaron = data.filter(e => e.pj > 0);
+  // Solo equipos válidos con al menos 1 partido
+  const jugaron = (data || []).filter(e => e && e.pj > 0);
   const og8  = jugaron.filter(e => e.og);
   const rest = jugaron.filter(e => !e.og);
 
   // Métricas reales
-  const ptsPJ  = e => e.pj > 0 ? e.pf / e.pj : 0;
-  const pcPJ   = e => e.pj > 0 ? e.pc / e.pj : 0;
-  const winPct = e => e.pj > 0 ? e.pg / e.pj : 0;
-  const difPJ  = e => (e.pf - e.pc) / e.pj;
+  const ptsPJ  = e => (e && e.pj > 0) ? e.pf / e.pj : 0;
+  const pcPJ   = e => (e && e.pj > 0) ? e.pc / e.pj : 0;
+  const winPct = e => (e && e.pj > 0) ? e.pg / e.pj : 0;
+  const difPJ  = e => (e && e.pj > 0) ? (e.pf - e.pc) / e.pj : 0;
   const difTot = e => e.pf - e.pc;
 
   // Normalizar contra TODOS los equipos de la liga

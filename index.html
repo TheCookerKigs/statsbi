@@ -2882,13 +2882,15 @@ function renderPredictor(data) {
 // RACHAS
 // ============================================================
 function renderRachas(data) {
-  const og8  = data.filter(e => e.og);   // clasificados 8G
-  const rest = data.filter(e => !e.og);  // no clasificados
+  // Solo equipos que han jugado al menos 1 partido
+  const jugaron = data.filter(e => e.pj > 0);
+  const og8  = jugaron.filter(e => e.og);
+  const rest = jugaron.filter(e => !e.og);
 
-  // Métricas reales de toda la temporada
-  const ptsPJ  = e => e.pf / e.pj;
-  const pcPJ   = e => e.pc / e.pj;
-  const winPct = e => e.pg / e.pj;
+  // Métricas reales
+  const ptsPJ  = e => e.pj > 0 ? e.pf / e.pj : 0;
+  const pcPJ   = e => e.pj > 0 ? e.pc / e.pj : 0;
+  const winPct = e => e.pj > 0 ? e.pg / e.pj : 0;
   const difPJ  = e => (e.pf - e.pc) / e.pj;
   const difTot = e => e.pf - e.pc;
 

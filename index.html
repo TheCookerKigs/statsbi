@@ -1272,19 +1272,6 @@ function renderCalor(data) {
   // Filas de la tabla
   const rows = withScore.map((e, i) => {
     const t = e.temp;
-  // Agregar equipos sin jugar al final con score=0
-  const rowsSinJugar = sinJugar.map((e,i) => {
-    const pos = data.length + i + 1;
-    const rankDisplay = pos;
-    return `<tr style="opacity:.5">
-      <td style="text-align:center;font-size:.75rem;width:32px">${rankDisplay}</td>
-      <td><span class="poder-team-name">${e.n}</span></td>
-      <td style="color:#8896b3;font-size:.75rem">${e.c}</td>
-      <td>-</td><td>-</td><td>-</td><td>-</td>
-      <td><div style="display:flex;gap:2px;align-items:center"><div style="flex:1;height:6px;background:#8896b3;border-radius:3px"></div><span style="font-size:.7rem;color:#8896b3">-</span></div></td>
-      <td style="color:#8896b3">-</td>
-    </tr>`;
-  }).join('');
     const color = tempColor(t);
     const barW = Math.max(4, Math.round((t / 100) * 100));
     const aWin = norm(wPct(e), allWin);
@@ -1372,7 +1359,7 @@ function renderCalor(data) {
             <th title="Score de poder 0-100">Score</th>
           </tr>
         </thead>
-        <tbody>${rows}${rowsSinJugar||''}</tbody>
+        <tbody>${rows}${sinJugar.map((e,i)=>`<tr style='opacity:.5'><td style='text-align:center;font-size:.75rem;width:32px'>${data.length+i+1}</td><td><span class='poder-team-name'>${e.n}</span></td><td style='color:#8896b3;font-size:.75rem'>${e.c}</td><td>-</td><td>-</td><td>-</td><td>-</td><td style='color:#8896b3;padding:4px'>—</td><td style='color:#8896b3'>-</td></tr>`).join('')}</tbody>
       </table>
     </div>
     <div style="font-size:.62rem;color:var(--text2);margin-top:10px;text-align:center">

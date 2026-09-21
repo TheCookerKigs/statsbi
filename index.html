@@ -2902,7 +2902,7 @@ function renderRachas(data) {
   const allPts = jugaron.map(ptsPJ);
   const allPc  = jugaron.map(pcPJ);
   const allWin = jugaron.map(winPct);
-  const allDif = data.map(difPJ);
+  const allDif = jugaron.map(difPJ);
 
   // Perfil de juego basado en stats reales
   const perfil = e => {
@@ -2938,9 +2938,9 @@ function renderRachas(data) {
   // Stat destacada de cada equipo (la más llamativa)
   const statTop = e => {
     const allData = [
-      { label: `${ptsPJ(e).toFixed(1)} pts/J`, rank: data.slice().sort((a,b)=>ptsPJ(b)-ptsPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en ataque' },
-      { label: `${pcPJ(e).toFixed(1)} pts/J`,  rank: data.slice().sort((a,b)=>pcPJ(a)-pcPJ(b)).findIndex(x=>x.n===e.n)+1,  mejor: false, desc: 'en defensa' },
-      { label: `+${difPJ(e).toFixed(1)}/J`,    rank: data.slice().sort((a,b)=>difPJ(b)-difPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en diferencial' },
+      { label: `${ptsPJ(e).toFixed(1)} pts/J`, rank: jugaron.slice().sort((a,b)=>ptsPJ(b)-ptsPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en ataque' },
+      { label: `${pcPJ(e).toFixed(1)} pts/J`,  rank: jugaron.slice().sort((a,b)=>pcPJ(a)-pcPJ(b)).findIndex(x=>x.n===e.n)+1,  mejor: false, desc: 'en defensa' },
+      { label: `+${difPJ(e).toFixed(1)}/J`,    rank: jugaron.slice().sort((a,b)=>difPJ(b)-difPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en diferencial' },
     ];
     // La más destacada = mejor rank
     return allData.sort((a,b)=>a.rank-b.rank)[0];
@@ -3090,8 +3090,8 @@ function renderRachas(data) {
     </div>`;
 
   // Stats de la liga completa para contexto
-  const promPF = (data.reduce((s,e)=>s+ptsPJ(e),0)/data.length).toFixed(1);
-  const promPC = (data.reduce((s,e)=>s+pcPJ(e),0)/data.length).toFixed(1);
+  const promPF = (jugaron.reduce((s,e)=>s+ptsPJ(e),0)/jugaron.length).toFixed(1);
+  const promPC = (jugaron.reduce((s,e)=>s+pcPJ(e),0)/jugaron.length).toFixed(1);
   const mejorAtaque  = [...data].sort((a,b)=>ptsPJ(b)-ptsPJ(a))[0];
   const mejorDefensa = [...data].sort((a,b)=>pcPJ(a)-pcPJ(b))[0];
   const masGanador   = [...data].sort((a,b)=>b.pg-a.pg)[0];
@@ -3129,7 +3129,7 @@ function renderRachas(data) {
         ⚡ Élite ABE <span style="color:var(--gold)">${genLabel} 2025-26</span>
       </div>
       <div style="font-size:.75rem;color:var(--text2)">
-        Análisis de los 8 clasificados · Stats reales de temporada regular · ${data.length} equipos en liga
+        Análisis de los 8 clasificados · Stats reales de temporada regular · ${jugaron.length} equipos en liga
       </div>
     </div>
 

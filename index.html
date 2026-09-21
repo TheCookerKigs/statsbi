@@ -2524,6 +2524,9 @@ function initFanZone(data) {
 // LAB — DASHBOARD METRICAS AVANZADAS
 // ============================================================
 function renderLab(data) {
+  data = data.filter(e => e && e.pj > 0);
+  if (!data.length) return '<div style="padding:30px;text-align:center;color:#8896b3">Sin datos suficientes aún para el Lab.</div>';
+
   return `<div class="lab-wrap">
     <div class="lab-header">
       <div class="lab-title-block">
@@ -2856,7 +2859,8 @@ function renderLockMsg(tab, icon, desc) {
 // PREDICTOR
 // ============================================================
 function renderPredictor(data) {
-  const og = data.filter(e=>e.og).slice(0,8);
+  const todos = data.filter(e=>e.pj>0);
+  const og = (data.filter(e=>e.og).length > 0 ? data.filter(e=>e.og) : todos.slice(0,8)).slice(0,8);
   const total = og.reduce((s,e)=>s+(e.pg/(e.pg+e.pp)),0);
   return `<div style="padding:20px 0">
     <h3 style="color:#ce93d8;margin-bottom:20px">🔮 Predictor de Campeonato · ${currentGenero==='M'?'Varonil':'Femenil'}</h3>

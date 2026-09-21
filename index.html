@@ -2899,9 +2899,9 @@ function renderRachas(data) {
     const mn = Math.min(...arr), mx = Math.max(...arr);
     return mx === mn ? 0.5 : Math.max(0, Math.min(1, (val-mn)/(mx-mn)));
   };
-  const allPts = data.map(ptsPJ);
-  const allPc  = data.map(pcPJ);
-  const allWin = data.map(winPct);
+  const allPts = jugaron.map(ptsPJ);
+  const allPc  = jugaron.map(pcPJ);
+  const allWin = jugaron.map(winPct);
   const allDif = data.map(difPJ);
 
   // Perfil de juego basado en stats reales

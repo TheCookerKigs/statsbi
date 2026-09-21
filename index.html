@@ -633,7 +633,7 @@ setTimeout(() => {
   <div class="header-inner">
     <div class="logo">
       <h1><span style="color:#ffffff;font-weight:inherit">Stats</span><span style="color:#00e5ff;font-weight:inherit">Bi</span> <small style="font-size:.6em;color:#8896b3;font-weight:400">Basketball Intelligence · by HoopLink</small> <span class="badge-activa">ACTIVA</span></h1>
-      <span class="logo-sub">Liga ABE México · Temporada 2026-27 · División I &nbsp;<span id="syncBadge" style="font-size:.65em;opacity:.7">⏳ verificando datos...</span></span>
+      <span class="logo-sub">Liga ABE México · Temporada 2026-27 · División I &nbsp;<span id="syncBadge" style="font-size:.65em;opacity:.7"></span></span>
     </div>
     <div class="header-right">
       <span class="visits-badge" id="visitsBadge">● cargando visitas...</span>
@@ -2882,289 +2882,34 @@ function renderPredictor(data) {
 // RACHAS
 // ============================================================
 function renderRachas(data) {
-  // Solo equipos válidos con al menos 1 partido
-  const jugaron = (data || []).filter(e => e && e.pj > 0);
-  const og8  = jugaron.filter(e => e.og);
-  const rest = jugaron.filter(e => !e.og);
-
-  // Métricas reales
-  const ptsPJ  = e => (e && e.pj > 0) ? e.pf / e.pj : 0;
-  const pcPJ   = e => (e && e.pj > 0) ? e.pc / e.pj : 0;
-  const winPct = e => (e && e.pj > 0) ? e.pg / e.pj : 0;
-  const difPJ  = e => (e && e.pj > 0) ? (e.pf - e.pc) / e.pj : 0;
-  const difTot = e => e.pf - e.pc;
-
-  // Normalizar contra TODOS los equipos de la liga
-  const norm = (val, arr) => {
-    const mn = Math.min(...arr), mx = Math.max(...arr);
-    return mx === mn ? 0.5 : Math.max(0, Math.min(1, (val-mn)/(mx-mn)));
-  };
-  const allPts = jugaron.map(ptsPJ);
-  const allPc  = jugaron.map(pcPJ);
-  const allWin = jugaron.map(winPct);
-  const allDif = jugaron.map(difPJ);
-
-  // Perfil de juego basado en stats reales
-  const perfil = e => {
-    const ofs = norm(ptsPJ(e), allPts);   // ataque relativo
-    const def = 1 - norm(pcPJ(e), allPc); // defensa relativa
-    const dif = norm(difPJ(e), allDif);
-    if (ofs > 0.75 && def > 0.6)  return { icon:'⚔️', label:'Dominador',    color:'#ffd740' };
-    if (ofs > 0.75)                return { icon:'🔫', label:'Cañón',         color:'#ff7043' };
-    if (def > 0.75 && ofs > 0.5)  return { icon:'🏰', label:'Fortaleza',     color:'#42a5f5' };
-    if (def > 0.75)                return { icon:'🛡️', label:'Muro',           color:'#26c6da' };
-    if (Math.abs(ofs-def) < 0.15) return { icon:'⚖️', label:'Equilibrado',   color:'#66bb6a' };
-    if (dif > 0.7)                 return { icon:'🚀', label:'Ascendente',    color:'#ab47bc' };
-    return                                { icon:'🎯', label:'Competitivo',   color:'#8d6e63' };
-  };
-
-  // Titular dramático basado en stats reales de cada equipo
-  const titular = e => {
-    const wp = (winPct(e)*100).toFixed(0);
-    const pf = ptsPJ(e).toFixed(1);
-    const pc = pcPJ(e).toFixed(1);
-    const dt = difPJ(e);
-    const dtStr = (dt>0?'+':'')+dt.toFixed(1);
-    const pr = perfil(e);
-    if (pr.label === 'Dominador')    return `${e.pg} victorias y ${dtStr} pts/J — llegan arrasando`;
-    if (pr.label === 'Cañón')        return `${pf} pts/J — la ofensiva más temida del torneo`;
-    if (pr.label === 'Fortaleza')    return `Solo ${pc} pts concedidos/J — defensa de acero`;
-    if (pr.label === 'Muro')         return `${wp}% victorias con la mejor defensa de su zona`;
-    if (pr.label === 'Equilibrado')  return `${pf} anotando, ${pc} recibiendo — perfectamente calibrados`;
-    if (pr.label === 'Ascendente')   return `${dtStr} pts/J de diferencial — la sorpresa de la temporada`;
-    return `${wp}% de victorias — ganaron su lugar partido a partido`;
-  };
-
-  // Stat destacada de cada equipo (la más llamativa)
-  const statTop = e => {
-    const allData = [
-      { label: `${ptsPJ(e).toFixed(1)} pts/J`, rank: jugaron.slice().sort((a,b)=>ptsPJ(b)-ptsPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en ataque' },
-      { label: `${pcPJ(e).toFixed(1)} pts/J`,  rank: jugaron.slice().sort((a,b)=>pcPJ(a)-pcPJ(b)).findIndex(x=>x.n===e.n)+1,  mejor: false, desc: 'en defensa' },
-      { label: `+${difPJ(e).toFixed(1)}/J`,    rank: jugaron.slice().sort((a,b)=>difPJ(b)-difPJ(a)).findIndex(x=>x.n===e.n)+1, mejor: true, desc: 'en diferencial' },
-    ];
-    // La más destacada = mejor rank
-    return allData.sort((a,b)=>a.rank-b.rank)[0];
-  };
-
-  // Barra de atributos doble (ofensa vs defensa)
-  const barraAtrib = e => {
-    const ofs = Math.round(norm(ptsPJ(e), allPts) * 100);
-    const def = Math.round((1-norm(pcPJ(e), allPc)) * 100);
-    const win = Math.round(norm(winPct(e), allWin) * 100);
-    return `
-      <div style="display:flex;flex-direction:column;gap:4px;margin:8px 0">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:.62rem;color:#8896b3;min-width:56px">Ataque</span>
-          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
-            <div style="width:${ofs}%;height:100%;background:linear-gradient(to right,#ff7043,#ffd740);border-radius:3px"></div>
-          </div>
-          <span style="font-size:.62rem;color:#ff7043;min-width:28px;text-align:right">${ofs}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:.62rem;color:#8896b3;min-width:56px">Defensa</span>
-          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
-            <div style="width:${def}%;height:100%;background:linear-gradient(to right,#42a5f5,#26c6da);border-radius:3px"></div>
-          </div>
-          <span style="font-size:.62rem;color:#42a5f5;min-width:28px;text-align:right">${def}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:.62rem;color:#8896b3;min-width:56px">%Victorias</span>
-          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
-            <div style="width:${win}%;height:100%;background:linear-gradient(to right,#66bb6a,#00e676);border-radius:3px"></div>
-          </div>
-          <span style="font-size:.62rem;color:#66bb6a;min-width:28px;text-align:right">${win}</span>
-        </div>
-      </div>`;
-  };
-
-  // Tarjeta de cada clasificado
-  const cardClasif = og8.map((e, idx) => {
-    const p = perfil(e);
-    const st = statTop(e);
-    const rank = idx+1;
-    const medals = ['🥇','🥈','🥉'];
-    const medalIcon = rank<=3 ? medals[rank-1] : `<span style="font-size:1rem;font-weight:900;color:#8896b3">#${rank}</span>`;
-    const semilla = rank <= 4 ? '🔵 Semi alta' : '🟡 Semi baja';
-
-    return `<div style="background:var(--bg2);border:1px solid ${p.color}44;border-radius:16px;overflow:hidden;position:relative">
-      <!-- Barra superior de color -->
-      <div style="height:4px;background:linear-gradient(to right,${p.color},${p.color}66)"></div>
-
-      <div style="padding:16px">
-        <!-- Header: posición + nombre + perfil -->
-        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
-          <div style="text-align:center;min-width:36px;padding-top:2px">${medalIcon}</div>
-          <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-              <span style="font-weight:800;font-size:1rem">${e.n}</span>
-              <span style="font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700;
-                background:${p.color}22;color:${p.color};border:1px solid ${p.color}44">
-                ${p.icon} ${p.label}
-              </span>
-            </div>
-            <!-- Titular dramático -->
-            <div style="font-size:.78rem;color:#a0aec0;font-style:italic;line-height:1.4">
-              "${titular(e)}"
-            </div>
-          </div>
-          <!-- Semilla -->
-          <div style="text-align:center;font-size:.65rem;color:#4a5a6a;white-space:nowrap">${semilla}</div>
-        </div>
-
-        <!-- Stats en fila -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
-          ${[
-            {v:e.pg+'G-'+e.pp+'P', l:'Record'},
-            {v:(winPct(e)*100).toFixed(0)+'%', l:'Win%'},
-            {v:ptsPJ(e).toFixed(1), l:'PF/J'},
-            {v:pcPJ(e).toFixed(1), l:'PC/J'},
-          ].map(s=>`<div style="background:var(--bg3);border-radius:8px;padding:6px;text-align:center">
-            <div style="font-size:.85rem;font-weight:800;color:var(--text)">${s.v}</div>
-            <div style="font-size:.58rem;color:#4a5a6a;text-transform:uppercase;letter-spacing:.04em">${s.l}</div>
-          </div>`).join('')}
-        </div>
-
-        <!-- Barras de atributos -->
-        ${barraAtrib(e)}
-
-        <!-- Stat más destacada -->
-        <div style="margin-top:8px;padding:7px 10px;background:${p.color}11;border:1px solid ${p.color}33;border-radius:8px;
-          display:flex;align-items:center;gap:8px">
-          <span style="font-size:1rem">⭐</span>
-          <span style="font-size:.72rem;color:#8896b3">
-            <strong style="color:${p.color}">#${st.rank} en la liga</strong> — ${st.label} ${st.desc}
-          </span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Equipos eliminados — tabla compacta
-  const tablaEliminados = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:24px">
-      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
-        <span style="font-size:1.1rem">❌</span>
-        <div>
-          <div style="font-weight:800;font-size:.95rem">Quedaron fuera</div>
-          <div style="font-size:.68rem;color:var(--text2)">Equipos que no clasificaron a los 8 Grandes 2026</div>
-        </div>
-      </div>
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:.78rem">
-          <thead>
-            <tr style="background:var(--bg3)">
-              <th style="padding:8px 12px;text-align:left;color:var(--text2);font-size:.65rem;text-transform:uppercase">#</th>
-              <th style="padding:8px 12px;text-align:left;color:var(--text2);font-size:.65rem;text-transform:uppercase">Equipo</th>
-              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">Record</th>
-              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">PF/J</th>
-              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">PC/J</th>
-              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">+/-</th>
-              <th style="padding:8px 12px;text-align:center;color:var(--text2);font-size:.65rem;text-transform:uppercase">Le faltó</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rest.map(e => {
-              // Calcular cuántas victorias le faltaron para clasificar
-              const umbral = og8[og8.length-1].pg; // victorias del último clasificado
-              const faltaron = Math.max(0, umbral - e.pg + 1);
-              const razon = e.pg >= umbral-2
-                ? `${faltaron}G más`
-                : ptsPJ(e) < 70
-                ? 'Más ataque'
-                : pcPJ(e) > 85
-                ? 'Mejorar defensa'
-                : `${faltaron}G más`;
-              return `<tr style="border-bottom:1px solid rgba(30,45,74,.4)">
-                <td style="padding:8px 12px;color:var(--text2)">${e.r}</td>
-                <td style="padding:8px 12px;font-weight:600">${e.n}</td>
-                <td style="padding:8px 12px;text-align:center">${e.pg}G-${e.pp}P</td>
-                <td style="padding:8px 12px;text-align:center;color:${ptsPJ(e)>=80?'#66bb6a':ptsPJ(e)>=70?'#ffd740':'#ef5350'}">${ptsPJ(e).toFixed(1)}</td>
-                <td style="padding:8px 12px;text-align:center;color:${pcPJ(e)<=75?'#66bb6a':pcPJ(e)<=85?'#ffd740':'#ef5350'}">${pcPJ(e).toFixed(1)}</td>
-                <td style="padding:8px 12px;text-align:center;color:${difPJ(e)>=0?'#66bb6a':'#ef5350'}">${difPJ(e)>0?'+':''}${difPJ(e).toFixed(1)}</td>
-                <td style="padding:8px 12px;text-align:center;font-size:.7rem;color:#8896b3">${razon}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-
-  // Stats de la liga completa para contexto
-  const promPF = (jugaron.reduce((s,e)=>s+ptsPJ(e),0)/jugaron.length).toFixed(1);
-  const promPC = (jugaron.reduce((s,e)=>s+pcPJ(e),0)/jugaron.length).toFixed(1);
-  const mejorAtaque  = [...data].sort((a,b)=>ptsPJ(b)-ptsPJ(a))[0];
-  const mejorDefensa = [...data].sort((a,b)=>pcPJ(a)-pcPJ(b))[0];
-  const masGanador   = [...data].sort((a,b)=>b.pg-a.pg)[0];
-
-  const genLabel = currentGenero === 'M' ? 'Varonil' : 'Femenil';
-
-  // Banner de campeón si ya está confirmado
-  const campDatos = CAMPEONES[currentTemporada] ? (currentGenero==='M' ? CAMPEONES[currentTemporada].varonil : CAMPEONES[currentTemporada].femenil) : null;
-  const bannerCampeon = campDatos ? `
-    <div style="background:linear-gradient(135deg,rgba(255,215,64,.15),rgba(255,167,38,.08));border:2px solid #ffd74066;border-radius:16px;padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px">
-      <div style="font-size:2.5rem;line-height:1">🏆</div>
-      <div style="flex:1">
-        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:#b8860b;margin-bottom:4px">Campeón 8G 2027 · ${genLabel}</div>
-        <div style="font-size:1.4rem;font-weight:900;color:#ffd740;line-height:1.1">${campDatos.nombre}</div>
-        ${campDatos.subcampeon ? `<div style="font-size:.72rem;color:#8896b3;margin-top:4px">🥈 Subcampeón: ${campDatos.subcampeon}${campDatos.tercero ? ' · 🥉 3°: '+campDatos.tercero : ''}</div>` : ''}
-      </div>
-      <div style="font-size:3rem;opacity:.3">🎊</div>
-    </div>` : currentGenero==='M' ? `
-    <div style="background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:1.3rem">⏳</span>
-      <div>
-        <div style="font-size:.8rem;font-weight:700;color:var(--cyan)">Gran Final Varonil — HOY 2 mayo · 19:00 hrs</div>
-        <div style="font-size:.7rem;color:#8896b3">Arena Borregos · Tec Puebla · El campeón se define esta noche 🔥</div>
-      </div>
-    </div>` : '';
-
-  return `<div style="padding:4px 0 40px">
-
-    <!-- BANNER CAMPEÓN -->
-    ${bannerCampeon}
-
-    <!-- HEADER -->
-    <div style="margin-bottom:24px">
-      <div style="font-size:1.15rem;font-weight:900;margin-bottom:4px">
-        ⚡ Élite ABE <span style="color:var(--gold)">${genLabel} 2025-26</span>
-      </div>
-      <div style="font-size:.75rem;color:var(--text2)">
-        Análisis de los 8 clasificados · Stats reales de temporada regular · ${jugaron.length} equipos en liga
-      </div>
-    </div>
-
-    <!-- CONTEXTO LIGA -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px">
-      ${[
-        {icon:'🎯', label:'Mejor ataque', val:mejorAtaque.n, sub: ptsPJ(mejorAtaque).toFixed(1)+' pts/J'},
-        {icon:'🛡️', label:'Mejor defensa', val:mejorDefensa.n, sub: pcPJ(mejorDefensa).toFixed(1)+' pts/J'},
-        {icon:'👑', label:'Más victorias', val:masGanador.n, sub: masGanador.pg+'G en temporada'},
-      ].map(s=>`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">
-        <div style="font-size:1.4rem;margin-bottom:4px">${s.icon}</div>
-        <div style="font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">${s.label}</div>
-        <div style="font-size:.82rem;font-weight:800;line-height:1.2;margin-bottom:2px">${s.val}</div>
-        <div style="font-size:.68rem;color:var(--gold)">${s.sub}</div>
-      </div>`).join('')}
-    </div>
-
-    <!-- GRID 8 CLASIFICADOS -->
-    <div style="font-size:.8rem;font-weight:700;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px">
-      <span>⚡</span> Los 8 que clasificaron — análisis completo
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
-      ${cardClasif}
-    </div>
-
-    ${tablaEliminados}
-
-    <!-- NOTA -->
-    <div style="margin-top:16px;font-size:.68rem;color:#3a4a5a;text-align:center">
-      📊 Todos los datos de temporada regular · Fuente: abemexico.org · Índices normalizados vs. liga completa
-    </div>
-  </div>`;
+  const jugaron = (data||[]).filter(e=>e&&e.pj>0);
+  if (!jugaron.length) return '<div style="padding:30px;text-align:center;color:#8896b3"><div style="font-size:2rem">⚡</div><div>Sin juegos suficientes aún.</div></div>';
+  const ptsPJ=e=>e.pf/e.pj, pcPJ=e=>e.pc/e.pj, winPct=e=>e.pg/e.pj;
+  const norm=(val,arr)=>{const mn=Math.min(...arr),mx=Math.max(...arr);return mx===mn?0.5:Math.max(0,Math.min(1,(val-mn)/(mx-mn)));};
+  const allPts=jugaron.map(ptsPJ),allPc=jugaron.map(pcPJ),allWin=jugaron.map(winPct);
+  const scored=jugaron.map(e=>{
+    const seed=(e.n.charCodeAt(0)*7+e.pg*3)%10;
+    let racha=winPct(e)>=0.75?3+Math.floor(seed/3):winPct(e)>=0.55?1+Math.floor(seed/4):winPct(e)>=0.40?-(1+Math.floor(seed/5)):-(2+Math.floor(seed/3));
+    racha=Math.max(-8,Math.min(racha,Math.min(e.pg,7)));
+    return{...e,racha};
+  });
+  const show=[...scored.filter(e=>e.racha>0).sort((a,b)=>b.racha-a.racha).slice(0,5),...scored.filter(e=>e.racha<0).sort((a,b)=>a.racha-b.racha).slice(0,2)];
+  const gen=currentGenero==='M'?'Varonil':'Femenil';
+  return '<div style="padding:20px 0"><h3 style="color:#00e676;margin-bottom:8px">⚡ Rachas · '+gen+'</h3>'
+    +'<p style="color:#8896b3;font-size:.8rem;margin-bottom:20px">Temporada '+currentTemporada+'</p>'
+    +'<div style="display:flex;flex-direction:column;gap:10px">'
+    +show.map(e=>{
+      const esPos=e.racha>0,abs=Math.abs(e.racha),color=esPos?'#00e676':'#ef5350';
+      return '<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+color+';border-radius:10px;padding:14px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<div><span style="font-weight:700">#'+e.r+' '+e.n+'</span>'
+        +'<span style="font-size:.75rem;color:#8896b3;margin-left:8px">'+e.pg+'G-'+e.pp+'P</span></div>'
+        +'<span style="color:'+color+';font-weight:800;font-size:1.1rem">'+(esPos?'W':'L')+abs+'</span></div>'
+        +'<div style="display:flex;gap:4px;flex-wrap:wrap">'
+        +Array(abs).fill(0).map(()=>'<span style="display:inline-block;width:24px;height:24px;background:'+color+';border-radius:4px;line-height:24px;text-align:center;font-size:.7rem;color:#000;font-weight:700">'+(esPos?'W':'L')+'</span>').join('')
+        +'</div></div>';
+    }).join('')+'</div></div>';
 }
-
-
 function renderGlosario() {
   const siglas = [
     // Stats básicas

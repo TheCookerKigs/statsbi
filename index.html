@@ -516,17 +516,13 @@ function closeHooplinkToast() {
   if (t) t.style.display = 'none';
   localStorage.setItem('hlToast', Date.now());
 }
-// Mostrar toast 4s después, solo si no se mostró en las últimas 24h
+// Mostrar toast 4s después de entrar — siempre
 setTimeout(() => {
-  const last = localStorage.getItem('hlToast');
-  const aDia = 86400000;
-  if (!last || Date.now() - last > aDia) {
-    const t = document.getElementById('hooplinkToast');
-    if (t) {
-      t.style.display = 'block';
-      // Auto-cerrar a los 8s
-      setTimeout(() => closeHooplinkToast(), 8000);
-    }
+  const t = document.getElementById('hooplinkToast');
+  if (t) {
+    t.style.display = 'block';
+    // Auto-cerrar a los 8s
+    setTimeout(() => closeHooplinkToast(), 8000);
   }
 }, 4000);
 </script>

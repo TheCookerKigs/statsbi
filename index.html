@@ -3085,51 +3085,18 @@ function getEquipos(genero) {
 
 // ── BADGE ÚLTIMA SINCRONIZACIÓN ─────────────────────────────
 async function checkSyncBadge() {
+  // Mostrar jornada actual basada en los datos cargados
   const badge = document.getElementById('syncBadge');
   if (!badge) return;
-  try {
-    const { data } = await supabase
-      .from('equipos')
-      .select('updated_at')
-      .order('updated_at', { ascending: false })
-      .limit(1);
-    if (data && data[0] && data[0].updated_at) {
-      const dt = new Date(data[0].updated_at);
-      const ahora = new Date();
-      const diffH = Math.floor((ahora - dt) / 3600000);
-      const diffD = Math.floor(diffH / 24);
-      const hora = dt.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-      const fecha = dt.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
-      if (diffH < 24) {
-        badge.textContent = `✅ Sync hoy ${hora}`;
-        badge.style.color = '#00e676';
-      } else if (diffD === 1) {
-        badge.textContent = `🟡 Sync ayer ${hora}`;
-        badge.style.color = '#ffd740';
-      } else {
-        badge.textContent = `📊 Sync ${fecha}`;
-        badge.style.color = '#8896b3';
-      }
-    } else {
-      badge.textContent = '📊 Datos 2025-26';
-      badge.style.color = '#8896b3';
-    }
-  } catch(e) {
-    badge.textContent = '📊 Datos 2025-26';
-    badge.style.color = '#8896b3';
+  const data = getEquipos('M');
+  if (!data || !data.length) return;
+  const maxJJ = Math.max(...data.map(e=>e.pj||0));
+  if (maxJJ > 0) {
+    badge.textContent = `J${maxJJ} actualizado`;
+  } else {
+    badge.textContent = '';
   }
-}
-
-// Init inmediato — no esperar al evento load
-function initApp() {
-  initTicker();
-  updateOG();
-  renderContent();
-  setTimeout(loadVisitas, 500);
-  setTimeout(checkSyncBadge, 1200);
-  setInterval(updateOG, 3600000);
-  loadEquiposFromSupabase();
-  supabase.auth.getSession().then(({data:{session}}) => {
+}}) => {
     if (session?.user) {
       currentUser = session.user;
       isLoggedIn = true;

@@ -3097,15 +3097,6 @@ async function checkSyncBadge() {
     badge.textContent = '';
   }
 }
-}) => {
-    if (session?.user) {
-      currentUser = session.user;
-      isLoggedIn = true;
-      updateAuthUI();
-      renderContent();
-    }
-  });
-}
 
 // Inicializar Supabase con retry hasta que el SDK esté disponible
 function initSupabase(retries) {

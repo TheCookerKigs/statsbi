@@ -1208,6 +1208,7 @@ function renderPosiciones(data) {
 // MAPA CALOR
 // ============================================================
 function renderCalor(data) {
+  data = data.filter(e => e && e.pj > 0);
   // Normalizar 0-1 contra toda la liga
   const norm = (val, arr) => {
     const mn = Math.min(...arr), mx = Math.max(...arr);
@@ -2591,20 +2592,20 @@ function renderLab(data) {
 
 function initLab(data) {
   // ── CÁLCULOS BASE — todos los equipos ───────────────────
-  const maxPts   = Math.max(...data.map(e=>e.pf/e.pj));
-  const minPts   = Math.min(...data.map(e=>e.pf/e.pj));
-  const maxDef   = Math.max(...data.map(e=>e.pc/e.pj));
-  const minDef   = Math.min(...data.map(e=>e.pc/e.pj));
+  const maxPts   = Math.max(...data.map(e=>(e.pj>0?e.pf/e.pj:0)));
+  const minPts   = Math.min(...data.map(e=>(e.pj>0?e.pf/e.pj:0)));
+  const maxDef   = Math.max(...data.map(e=>(e.pj>0?e.pc/e.pj:0)));
+  const minDef   = Math.min(...data.map(e=>(e.pj>0?e.pc/e.pj:0)));
   const maxDifN  = Math.max(...data.map(e=>(e.pf-e.pc)/e.pj));
   const minDifN  = Math.min(...data.map(e=>(e.pf-e.pc)/e.pj));
   const rngDif   = maxDifN - minDifN || 1;
 
   const teams = data.map(e => {
-    const winPct   = e.pg / e.pj;
-    const ptsPorJ  = e.pf / e.pj;
-    const ptsCPorJ = e.pc / e.pj;
-    const difNeto  = (e.pf - e.pc) / e.pj;
-    const ritmo    = (e.pf + e.pc) / e.pj;
+    const winPct   = e.pg / (e.pj||1);
+    const ptsPorJ  = e.pf / (e.pj||1);
+    const ptsCPorJ = e.pc / (e.pj||1);
+    const difNeto  = (e.pf - e.pc) / (e.pj||1);
+    const ritmo    = (e.pf + e.pc) / (e.pj||1);
 
     // ── Índice de Dominancia (exclusivo StatsBi) ──────────
     // Normalizar cada componente 0-100

@@ -1239,7 +1239,7 @@ function renderCalor(data) {
   };
 
   // Calcular scores y ordenar de más caliente a más frío
-  const withScore = data.map(e => ({ ...e, temp: tempScore(e) }))
+  const withScore = data.map(e => ({ ...e, temp: isNaN(tempScore(e)) ? 0 : tempScore(e) }))
                         .sort((a, b) => b.temp - a.temp);
 
   const maxT = withScore[0].temp;

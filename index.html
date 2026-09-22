@@ -1216,10 +1216,10 @@ function renderCalor(data) {
     return Math.max(0, Math.min(1, (val - mn) / (mx - mn)));
   };
 
-  const ptsPJ   = e => e.pf / e.pj;
-  const pcPJ    = e => e.pc / e.pj;
-  const difPJ   = e => (e.pf - e.pc) / e.pj;
-  const wPct    = e => e.pg / e.pj;
+  const ptsPJ   = e => (e.pj>0?e.pf/e.pj:0);
+  const pcPJ    = e => (e.pj>0?e.pc/e.pj:0);
+  const difPJ   = e => (e.pj>0?(e.pf-e.pc)/e.pj:0);
+  const wPct    = e => (e.pj>0?e.pg/e.pj:0);
   const ratio   = e => ptsPJ(e) / pcPJ(e);
 
   const allPts  = data.map(ptsPJ);

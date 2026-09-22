@@ -1266,7 +1266,7 @@ function renderCalor(data) {
   };
 
   const hotTeam  = withScore[0];
-  const coldTeam = withScore[withScore.length - 1];
+  const coldTeam = withScore.filter(e=>!isNaN(e.score))[withScore.filter(e=>!isNaN(e.score)).length - 1] || withScore[withScore.length-1];
 
   // Filas de la tabla
   const rows = withScore.map((e, i) => {
@@ -1329,7 +1329,7 @@ function renderCalor(data) {
         <div class="poder-extremo-info">
           <div class="poder-extremo-label">Equipo más caliente</div>
           <div class="poder-extremo-name">${hotTeam.n}</div>
-          <div style="font-size:.7rem;color:#ef9a9a;margin-top:2px">${Math.round(wPct(hotTeam)*100)}%G · ${ptsPJ(hotTeam).toFixed(1)} PF/J · ${difPJ(hotTeam)>0?'+':''}${difPJ(hotTeam).toFixed(1)}/J</div>
+          <div style="font-size:.7rem;color:#ef9a9a;margin-top:2px">${hotTeam&&hotTeam.pj>0?Math.round((hotTeam.pg/hotTeam.pj)*100):0}%G · ${ptsPJ(hotTeam).toFixed(1)} PF/J · ${difPJ(hotTeam)>0?'+':''}${difPJ(hotTeam).toFixed(1)}/J</div>
         </div>
         <div class="poder-extremo-score">${hotTeam.temp}</div>
       </div>
@@ -1338,7 +1338,7 @@ function renderCalor(data) {
         <div class="poder-extremo-info">
           <div class="poder-extremo-label">Equipo más frío</div>
           <div class="poder-extremo-name">${coldTeam.n}</div>
-          <div style="font-size:.7rem;color:#90caf9;margin-top:2px">${Math.round(wPct(coldTeam)*100)}%G · ${ptsPJ(coldTeam).toFixed(1)} PF/J · ${difPJ(coldTeam)>0?'+':''}${difPJ(coldTeam).toFixed(1)}/J</div>
+          <div style="font-size:.7rem;color:#90caf9;margin-top:2px">${coldTeam&&coldTeam.pj>0?Math.round((coldTeam.pg/coldTeam.pj)*100):0}%G · ${ptsPJ(coldTeam).toFixed(1)} PF/J · ${difPJ(coldTeam)>0?'+':''}${difPJ(coldTeam).toFixed(1)}/J</div>
         </div>
         <div class="poder-extremo-score">${coldTeam.temp}</div>
       </div>

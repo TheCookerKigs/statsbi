@@ -974,7 +974,7 @@ async function loadVisitas() {
   if (typeof supabase === 'undefined') return;
   const today = new Date().toISOString().split('T')[0];
   const badge = document.getElementById('visitsBadge');
-  supabase.from('visitas').select('id,contador').eq('fecha', today)
+  return supabase.from('visitas').select('id,contador').eq('fecha', today)
     .then(async ({ data, error }) => {
       if (error) { if (badge) badge.textContent = ''; return; }
       try {
@@ -3169,7 +3169,8 @@ function initSupabase(retries) {
         currentUser = null; isLoggedIn = false; updateAuthUI();
       }
     });
-    initApp();
+    renderContent();
+    loadVisitas();
   } else if (retries > 0) {
     setTimeout(() => initSupabase(retries - 1), 150);
   } else {

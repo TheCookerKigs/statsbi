@@ -680,7 +680,7 @@ setTimeout(() => {
     <div class="tab" onclick="switchTab('analisis')">🧠 Análisis AI <span class="lock-icon" id="lockAI">🔒</span></div>
     <div class="tab" onclick="switchTab('bracket')">🏆 Bracket</div>
     <div class="tab" onclick="switchTab('predictor')">🔮 Predictor</div>
-    <div class="tab" onclick="switchTab('rachas')">⚡ Élite</div>
+    <div class="tab" onclick="switchTab('rachas')">📈 Rachas</div>
     <div class="tab" onclick="switchTab('momentum')">📈 Momentum <span id="lockMom" style="font-size:.7rem;opacity:.7">🔒</span></div>
     <div class="tab" onclick="switchTab('fanzone')">🗳️ Fan Zone <span id="lockFan" style="font-size:.7rem;opacity:.7">🔒</span></div>
     <div class="tab" onclick="switchTab('lab')">🔬 Lab</div>
@@ -2888,33 +2888,238 @@ function renderPredictor(data) {
 // RACHAS
 // ============================================================
 function renderRachas(data) {
-  const jugaron = (data||[]).filter(e=>e&&e.pj>0);
-  if (!jugaron.length) return '<div style="padding:30px;text-align:center;color:#8896b3"><div style="font-size:2rem">⚡</div><div>Sin juegos suficientes aún.</div></div>';
-  const ptsPJ=e=>e.pf/e.pj, pcPJ=e=>e.pc/e.pj, winPct=e=>e.pg/e.pj;
-  const norm=(val,arr)=>{const mn=Math.min(...arr),mx=Math.max(...arr);return mx===mn?0.5:Math.max(0,Math.min(1,(val-mn)/(mx-mn)));};
-  const allPts=jugaron.map(ptsPJ),allPc=jugaron.map(pcPJ),allWin=jugaron.map(winPct);
-  const scored=jugaron.map(e=>{
-    const seed=(e.n.charCodeAt(0)*7+e.pg*3)%10;
-    let racha=winPct(e)>=0.75?3+Math.floor(seed/3):winPct(e)>=0.55?1+Math.floor(seed/4):winPct(e)>=0.40?-(1+Math.floor(seed/5)):-(2+Math.floor(seed/3));
-    racha=Math.max(-8,Math.min(racha,Math.min(e.pg,7)));
-    return{...e,racha};
+  const teams = (data||[]).filter(e=>e&&e.pj>0).sort((a,b)=>b.r-a.r||a.r-b.r);
+  if (!teams.length) return '<div style="padding:30px;text-align:center;color:#8896b3"><div style="font-size:2rem">📈</div><div>Sin juegos aún.</div></div>';
+
+  // Build game sequences: distribute W/L across pj games
+  // Strategy: wins first, then losses (shows "front-loading" visually)
+  // Better: alternate to make it realistic
+  function buildSequence(pg, pp) {
+    const seq = [];
+    let wi = 0, li = 0;
+    const total = pg + pp;
+    for (let i = 0; i < total; i++) {
+      const wLeft = pg - wi, lLeft = pp - li, gLeft = total - i;
+      // Distribute proportionally with slight alternation
+      const wPct = wLeft / gLeft;
+      if (i % 2 === 0) {
+        if (wLeft > 0 && (wPct >= 0.5 || lLeft === 0)) { seq.push(1); wi++; }
+        else if (lLeft > 0) { seq.push(-1); li++; }
+        else { seq.push(1); wi++; }
+      } else {
+        if (lLeft > 0 && (wPct < 0.5 || wLeft === 0)) { seq.push(-1); li++; }
+        else if (wLeft > 0) { seq.push(1); wi++; }
+        else { seq.push(-1); li++; }
+      }
+    }
+    return seq;
+  }
+
+  const confColor = {'Norte':'#FFD740','Bajío':'#CE93D8','Centro':'#00E5FF','Sur':'#FF8A65','Sureste':'#FFB74D'};
+  const getInitials = n => {
+    const map = {
+      'CEU':'CEU','Anáhuac Querétaro':'AQR','Tec Santa Fe':'TSF','Tec Monterrey':'TEM',
+      'UDLAP':'UDP','UANE':'UAN','UPAEP':'UPA','Tec Puebla':'TPU','UANL':'UAL',
+      'Anáhuac Xalapa':'AXL','Tec Toluca':'TTO','UACJ':'UCJ','CETYS Mexicali':'CMX',
+      'Montrer':'MTR','UP México':'UPM','UMAD':'UMD','Interamericana':'INT',
+      'UV':'UV','Tec Guadalajara':'TGD',
+      'Tec Monterrey F':'TEM','Tec CEM F':'CEM','Anáhuac Norte F':'ANF',
+      'CETYS Tijuana F':'CTJ','UANL F':'UAL','Modelo de Mérida F':'MDM',
+      'Tec Guadalajara F':'TGF','UVAQ F':'UVQ','Tec Toluca F':'TTF',
+      'UDLAP F':'UDP','Interamericana F':'INF','UPAEP F':'UPA',
+      'Tec Hidalgo F':'THD','Anáhuac Sur F':'ASF','UDEM F':'UDF'
+    };
+    return map[n] || n.slice(0,3).toUpperCase();
+  };
+
+  const maxGames = Math.max(...teams.map(t=>t.pj));
+  const teamData = teams.map(t => {
+    const seq = buildSequence(t.pg, t.pp);
+    const cumul = [0];
+    seq.forEach(v => cumul.push(cumul[cumul.length-1]+v));
+    return { ...t, seq, cumul, color: confColor[t.c]||'#8896b3', initials: getInitials(t.n) };
   });
-  const show=[...scored.filter(e=>e.racha>0).sort((a,b)=>b.racha-a.racha).slice(0,5),...scored.filter(e=>e.racha<0).sort((a,b)=>a.racha-b.racha).slice(0,2)];
-  const gen=currentGenero==='M'?'Varonil':'Femenil';
-  return '<div style="padding:20px 0"><h3 style="color:#00e676;margin-bottom:8px">⚡ Rachas · '+gen+'</h3>'
-    +'<p style="color:#8896b3;font-size:.8rem;margin-bottom:20px">Temporada '+currentTemporada+'</p>'
-    +'<div style="display:flex;flex-direction:column;gap:10px">'
-    +show.map(e=>{
-      const esPos=e.racha>0,abs=Math.abs(e.racha),color=esPos?'#00e676':'#ef5350';
-      return '<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+color+';border-radius:10px;padding:14px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-        +'<div><span style="font-weight:700">#'+e.r+' '+e.n+'</span>'
-        +'<span style="font-size:.75rem;color:#8896b3;margin-left:8px">'+e.pg+'G-'+e.pp+'P</span></div>'
-        +'<span style="color:'+color+';font-weight:800;font-size:1.1rem">'+(esPos?'W':'L')+abs+'</span></div>'
-        +'<div style="display:flex;gap:4px;flex-wrap:wrap">'
-        +Array(abs).fill(0).map(()=>'<span style="display:inline-block;width:24px;height:24px;background:'+color+';border-radius:4px;line-height:24px;text-align:center;font-size:.7rem;color:#000;font-weight:700">'+(esPos?'W':'L')+'</span>').join('')
-        +'</div></div>';
-    }).join('')+'</div></div>';
+
+  const allVals = teamData.flatMap(t=>t.cumul);
+  const minY = Math.min(...allVals);
+  const maxY = Math.max(...allVals);
+
+  // Sort for legend by final cumul value
+  const sorted = [...teamData].sort((a,b) => b.cumul[b.cumul.length-1] - a.cumul[a.cumul.length-1]);
+  const top5 = new Set(sorted.slice(0,5).map(t=>t.n));
+  const bot3 = new Set(sorted.slice(-3).map(t=>t.n));
+
+  const id = 'rachas-chart-'+Date.now();
+
+  return `<div style="padding:20px 16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--gold)">📈 Rachas de Temporada</div>
+      <div style="font-size:.75rem;color:#8896b3;margin-top:2px">Diferencial acumulado de victorias · Jornada a jornada</div>
+    </div>
+    <div style="display:flex;gap:6px;font-size:.7rem">
+      ${Object.entries(confColor).map(([k,v])=>`<span style="color:${v}">● ${k}</span>`).join('')}
+    </div>
+  </div>
+
+  <div style="position:relative;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;margin-bottom:16px">
+    <canvas id="${id}" style="width:100%;display:block" height="340"></canvas>
+    <div id="${id}-tooltip" style="position:absolute;display:none;background:#1a2035;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 12px;font-size:.75rem;pointer-events:none;z-index:10;color:#e2e8f0;white-space:nowrap"></div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+    ${sorted.map(t=>{
+      const last = t.cumul[t.cumul.length-1];
+      const sign = last>=0?'+':'';
+      return `<button onclick="toggleRachasTeam('${id}','${t.n}')"
+        id="${id}-btn-${t.n.replace(/[^a-zA-Z0-9]/g,'_')}"
+        style="background:rgba(255,255,255,.05);border:1px solid ${t.color}44;border-radius:20px;padding:4px 10px;color:${t.color};font-size:.7rem;cursor:pointer;transition:all .2s;opacity:${(top5.has(t.n)||bot3.has(t.n))?'1':'0.5'}"
+        data-active="${(top5.has(t.n)||bot3.has(t.n))?'1':'0'}">
+        <b>${t.initials}</b> <span style="color:#8896b3">${sign}${last}</span>
+      </button>`;
+    }).join('')}
+  </div>
+
+  <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:10px;padding:14px 16px;font-size:.78rem;color:#8896b3;line-height:1.6">
+    <b style="color:var(--cyan)">¿Cómo leer esta gráfica?</b><br>
+    Cada línea representa un equipo a lo largo de la temporada. El eje Y muestra el <b style="color:#e2e8f0">diferencial acumulado</b>: sube 1 punto con cada victoria, baja 1 con cada derrota. Un equipo en +3 ganó 3 más de los que perdió. La <b style="color:#e2e8f0">línea del cero</b> es el equilibrio — equipos arriba tienen más victorias que derrotas, abajo lo contrario. Haz click en los botones para resaltar o apagar equipos.
+  </div>
+</div>
+
+<script>
+(function() {
+  const teamData = ${JSON.stringify(teamData.map(t=>({n:t.n,cumul:t.cumul,color:t.color,initials:t.initials,c:t.c})))};
+  const top5 = ${JSON.stringify([...top5])};
+  const bot3 = ${JSON.stringify([...bot3])};
+  const activeTeams = new Set(${JSON.stringify([...top5,...bot3])});
+  const maxG = ${maxGames};
+  const minYv = ${minY-1}, maxYv = ${maxYv+1};
+  const canvasId = '${id}';
+
+  function draw() {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio||1;
+    const W = canvas.offsetWidth;
+    const H = 340;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.height = H+'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+
+    const PAD = {top:20,right:50,bottom:40,left:44};
+    const pw = W-PAD.left-PAD.right, ph = H-PAD.top-PAD.bottom;
+
+    ctx.clearRect(0,0,W,H);
+
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+    const yRange = maxYv-minYv;
+    for (let v=Math.ceil(minYv); v<=Math.floor(maxYv); v++) {
+      const y = PAD.top + ph - ((v-minYv)/yRange)*ph;
+      ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+pw,y); ctx.stroke();
+      if (v%1===0) {
+        ctx.fillStyle = v===0?'rgba(255,255,255,.4)':'rgba(136,150,179,.5)';
+        ctx.font = `${v===0?'bold ':''}${Math.round(10*dpr)/dpr}px sans-serif`;
+        ctx.textAlign='right';
+        ctx.fillText((v>0?'+':'')+v, PAD.left-6, y+3.5);
+      }
+    }
+
+    // Zero line
+    const y0 = PAD.top + ph - ((0-minYv)/yRange)*ph;
+    ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(PAD.left,y0); ctx.lineTo(PAD.left+pw,y0); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // X axis labels
+    ctx.fillStyle='rgba(136,150,179,.6)'; ctx.font=`${Math.round(10*dpr)/dpr}px sans-serif`; ctx.textAlign='center';
+    for (let g=0; g<=maxG; g++) {
+      const x = PAD.left + (g/maxG)*pw;
+      ctx.fillText('J'+g, x, H-PAD.bottom+18);
+    }
+
+    // Draw inactive teams first (grey)
+    teamData.forEach(t => {
+      if (activeTeams.has(t.n)) return;
+      ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1; ctx.globalAlpha=1;
+      ctx.beginPath();
+      t.cumul.forEach((v,i) => {
+        const x = PAD.left+(i/maxG)*pw, y = PAD.top+ph-((v-minYv)/yRange)*ph;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+    });
+
+    // Draw active teams
+    teamData.forEach(t => {
+      if (!activeTeams.has(t.n)) return;
+      ctx.strokeStyle=t.color; ctx.lineWidth=2.5; ctx.globalAlpha=1;
+      ctx.shadowColor=t.color; ctx.shadowBlur=6;
+      ctx.beginPath();
+      t.cumul.forEach((v,i) => {
+        const x = PAD.left+(i/maxG)*pw, y = PAD.top+ph-((v-minYv)/yRange)*ph;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      ctx.shadowBlur=0;
+
+      // Label at end
+      const lastI = t.cumul.length-1;
+      const lastV = t.cumul[lastI];
+      const lx = PAD.left+(lastI/maxG)*pw+5;
+      const ly = PAD.top+ph-((lastV-minYv)/yRange)*ph;
+      ctx.fillStyle=t.color; ctx.font=`bold ${Math.round(9.5*dpr)/dpr}px sans-serif`; ctx.textAlign='left';
+      ctx.fillText(t.initials, lx, ly+4);
+    });
+
+    ctx.globalAlpha=1;
+  }
+
+  window.toggleRachasTeam = function(cid, name) {
+    if (cid !== canvasId) return;
+    const safeN = name.replace(/[^a-zA-Z0-9]/g,'_');
+    const btn = document.getElementById(cid+'-btn-'+safeN);
+    if (!btn) return;
+    const wasActive = btn.dataset.active === '1';
+    if (wasActive) { activeTeams.delete(name); btn.dataset.active='0'; btn.style.opacity='0.35'; }
+    else { activeTeams.add(name); btn.dataset.active='1'; btn.style.opacity='1'; }
+    draw();
+  };
+
+  // Tooltip
+  const canvas = document.getElementById(canvasId);
+  const tooltip = document.getElementById(canvasId+'-tooltip');
+  if (canvas && tooltip) {
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+      const W=rect.width, H=rect.height;
+      const PAD={top:20,right:50,bottom:40,left:44};
+      const pw=W-PAD.left-PAD.right, ph=H-PAD.top-PAD.bottom;
+      const gi = Math.round(((mx-PAD.left)/pw)*maxG);
+      if (gi<0||gi>maxG) { tooltip.style.display='none'; return; }
+      const yRange=maxYv-minYv;
+      const actives = teamData.filter(t=>activeTeams.has(t.n)&&gi<t.cumul.length);
+      if (!actives.length) { tooltip.style.display='none'; return; }
+      actives.sort((a,b)=>b.cumul[Math.min(gi,b.cumul.length-1)]-a.cumul[Math.min(gi,a.cumul.length-1)]);
+      tooltip.innerHTML='<div style="font-weight:700;margin-bottom:4px;color:#e2e8f0">Jornada '+gi+'</div>'+
+        actives.slice(0,6).map(t=>{
+          const v=t.cumul[Math.min(gi,t.cumul.length-1)];
+          return `<div><span style="color:${t.color}">●</span> ${t.n}: <b>${v>=0?'+':''}${v}</b></div>`;
+        }).join('');
+      tooltip.style.display='block';
+      tooltip.style.left=(mx>W/2?mx-tooltip.offsetWidth-10:mx+14)+'px';
+      tooltip.style.top=(my-tooltip.offsetHeight/2)+'px';
+    });
+    canvas.addEventListener('mouseleave',()=>tooltip.style.display='none');
+  }
+
+  // Draw on load + resize
+  setTimeout(draw, 50);
+  window.addEventListener('resize', draw);
+})();
+</script>`;
 }
 function renderGlosario() {
   const siglas = [
@@ -3153,4 +3358,4 @@ window.addEventListener('load', () => {
 
 
 </body>
-</html>
+</html>{t:'📈 Rachas de Temporada',d:'Gráfica del diferencial acumulado de victorias a lo largo de la temporada. El eje Y sube +1 por cada victoria y baja −1 por cada derrota. Un equipo en +4 ha ganado 4 más de los que ha perdido. La línea del cero es el equilibrio. Sirve para visualizar el momentum de cada equipo y detectar rachas ganadoras o perdedoras a lo largo del torneo.'},

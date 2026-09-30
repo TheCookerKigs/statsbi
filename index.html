@@ -172,6 +172,8 @@
     .centro { background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
     .norte { background: rgba(255,215,64,.1); color: var(--gold); border: 1px solid rgba(255,215,64,.3); }
     .bajio { background: rgba(206,147,216,.1); color: var(--purple); border: 1px solid rgba(206,147,216,.3); }
+        .sur { background: rgba(255,138,101,.1); color: #ff8a65; border: 1px solid rgba(255,138,101,.3); }
+        .sureste { background: rgba(255,183,77,.1); color: #ffb74d; border: 1px solid rgba(255,183,77,.3); }
     .pg { color: var(--green); font-weight: 700; } .pp { color: var(--red); font-weight: 700; }
     .pos { color: var(--green); } .neg { color: var(--red); }
     .badge-og { background: rgba(0,230,118,.15); color: var(--green); border: 1px solid rgba(0,230,118,.3); padding: 2px 7px; border-radius: 8px; font-size: .72rem; font-weight: 700; margin-left: 6px; }
@@ -1172,7 +1174,7 @@ function renderPosiciones(data) {
   const esHistorico = currentTemporada !== '2026-27';
   const headerTemporada = esHistorico ? `<div style="background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.3);color:#ffd740;padding:8px 16px;border-radius:8px;margin-bottom:12px;font-size:.85rem">📅 Mostrando temporada histórica <strong>${currentTemporada}</strong> — Los datos son de archivo</div>` : '';
   const confColor = {
-    'Centro':'centro','Norte':'norte','Bajío':'bajio'
+    'Centro':'centro','Norte':'norte','Bajío':'bajio','Sur':'sur','Sureste':'sureste'
   };
   const rows = data.map(e => {
     const dif = e.pf - e.pc;

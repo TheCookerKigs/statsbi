@@ -2892,14 +2892,15 @@ function renderRachas(data) {
   if (!teams.length) return '<div style="padding:30px;text-align:center;color:#8896b3"><div style="font-size:2rem">📈</div><div>Sin juegos aún.</div></div>';
   window._rachasData = teams;
   const confColor = {'Norte':'#FFD740','Bajío':'#CE93D8','Centro':'#00E5FF','Sur':'#FF8A65','Sureste':'#FFB74D'};
-  const INITIALS = {'CEU':'CEU','Anáhuac Querétaro':'AQR','Tec Santa Fe':'TSF','Tec Monterrey':'TEM',
-    'UDLAP':'UDP','UANE':'UAN','UPAEP':'UPA','Tec Puebla':'TPU','UANL':'UAL',
-    'Anáhuac Xalapa':'AXL','Tec Toluca':'TTO','UACJ':'UCJ','CETYS Mexicali':'CMX',
-    'Montrer':'MTR','UP México':'UPM','UMAD':'UMD','Interamericana':'INT','UV':'UV','Tec Guadalajara':'TGD',
-    'Tec Monterrey F':'TEM','Tec CEM F':'CEM','Anáhuac Norte F':'ANF','CETYS Tijuana F':'CTJ',
-    'UANL F':'UAL','Modelo de Mérida F':'MDM','Tec Guadalajara F':'TGF','UVAQ F':'UVQ',
-    'Tec Toluca F':'TTF','UDLAP F':'UDP','Interamericana F':'INF','UPAEP F':'UPA',
-    'Tec Hidalgo F':'THD','Anáhuac Sur F':'ASF','UDEM F':'UDF'};
+  const INITIALS = {
+    'CEU':'CEU','Anáhuac Querétaro':'AQU','Tec Santa Fe':'TSF','Tec Monterrey':'MTY',
+    'UDLAP':'UDLAP','UANE':'UANE','UPAEP':'UPAEP','Tec Puebla':'TPU','UANL':'UANL',
+    'Anáhuac Xalapa':'AXL','Tec Toluca':'TOL','UACJ':'UACJ','CETYS Mexicali':'CMX',
+    'Montrer':'MTR','UP México':'UPM','UMAD':'UMAD','Interamericana':'INT','UV':'UV','Tec Guadalajara':'TGD',
+    'Tec Monterrey F':'MTY','Tec CEM F':'CEM','Anáhuac Norte F':'ANF','CETYS Tijuana F':'CTJ',
+    'UANL F':'UANL','Modelo de Mérida F':'MDM','Tec Guadalajara F':'TGD','UVAQ F':'UVAQ',
+    'Tec Toluca F':'TOL','UDLAP F':'UDLAP','Interamericana F':'INT','UPAEP F':'UPAEP',
+    'Tec Hidalgo F':'THD','Anáhuac Sur F':'ANS','UDEM F':'UDEM'};
   function buildSeq(pg,pp){
     const seq=[];let wi=0,li=0,total=pg+pp;
     for(let i=0;i<total;i++){
@@ -2917,8 +2918,8 @@ function renderRachas(data) {
   });
   window._rachasTeamData=teamData;
   const sorted=[...teamData].sort((a,b)=>b.cumul[b.cumul.length-1]-a.cumul[a.cumul.length-1]);
-  const maxG=Math.max(...teamData.map(t=>t.pj));
-  window._rachasMaxG=maxG;
+  const maxG=18; // Jornadas totales temporada regular ABE
+  window._rachasMaxG=18; // Jornadas totales temporada regular
   const top5=new Set(sorted.slice(0,5).map(t=>t.n));
   const bot3=new Set(sorted.slice(-3).map(t=>t.n));
   window._rachasActive=new Set([...top5,...bot3]);

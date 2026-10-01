@@ -1810,37 +1810,198 @@ async function analizarEquipo() {
   const idx = parseInt(document.getElementById('aiEquipo')?.value||0);
   const eq = data[idx];
   const genLabel = currentGenero === 'M' ? 'varonil' : 'femenil';
-  document.getElementById('aiResponse').innerHTML = `<div class="ai-loading"><div class="spinner"></div><span>Analizando ${eq.n} con IA...</span></div>`;
-  
-  const prompt = `Eres un analista experto de basquetbol universitario mexicano. Analiza al equipo ${eq.n} de la Liga ABE División I rama ${genLabel}, temporada 2025-26.
-
-Datos reales del equipo:
-- Posición: #${eq.r} de ${data.length}
-- Record: ${eq.pg}G - ${eq.pp}P (${eq.pj} jugados)
-- Puntos a favor: ${eq.pf} total (${(eq.pf/eq.pj).toFixed(1)} por juego)
-- Puntos en contra: ${eq.pc} total (${(eq.pc/eq.pj).toFixed(1)} por juego)
-- Diferencial: ${eq.pf-eq.pc > 0 ? '+':''}${eq.pf-eq.pc}
-- Clasificado al Ocho Grandes: ${eq.og ? 'SÍ' : 'NO'}
-
-Proporciona un análisis táctico detallado en español que incluya: fortalezas ofensivas, análisis defensivo, estilo de juego probable, y perspectiva para el Ocho Grandes 2026. Sé específico y usa los datos reales. Máximo 250 palabras.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const d = await res.json();
-    const text = d.content?.[0]?.text || 'No se pudo obtener el análisis.';
-    document.getElementById('aiResponse').innerHTML = `<div class="ai-text">${text}</div>`;
-  } catch(e) {
-    document.getElementById('aiResponse').innerHTML = `<div class="ai-text" style="color:#ff5252">Error al conectar con el análisis IA. Verifica tu conexión e intenta de nuevo.</div>`;
-  }
+  const box = document.getElementById('aiResponse');
+  box.innerHTML = '<div class="ai-loading"><div class="spinner"></div><span>Analizando ' + eq.n + '...</span></div>';
+  setTimeout(function() {
+    box.innerHTML = '<div class="ai-text">' + generarAnalisis(eq, data, genLabel) + '</div>';
+  }, 700);
 }
+
+// Identidad narrativa por equipo
+const IDENTIDAD = {
+  'CEU': 'CEU es el programa histórico de la conferencia Norte — conocido por su disciplina táctica y desarrollo de jugadores hacia el basquetbol profesional.',
+  'Anáhuac Querétaro': 'Anáhuac Querétaro ha consolidado un proyecto serio en el Bajío, con un estilo de juego organizado y una cantera que compite arriba año con año.',
+  'Tec Santa Fe': 'Tec Santa Fe es uno de los programas más ambiciosos del Tec de Monterrey, con instalaciones de primer nivel y un sistema ofensivo de alto ritmo.',
+  'Tec Monterrey': 'Tec Monterrey es el buque insignia del sistema Tec en varonil — históricamente uno de los programas más exitosos de la ABE con múltiples títulos.',
+  'UDLAP': 'UDLAP (Universidad de las Américas Puebla) tiene una identidad basada en el juego colectivo y la preparación académica-deportiva de sus atletas.',
+  'UANE': 'UANE es un programa en crecimiento del Norte que ha ido escalando posiciones en la ABE con una propuesta física e intensa en ambos lados de la cancha.',
+  'UPAEP': 'UPAEP representa a Puebla con un estilo agresivo que busca el ritmo alto y la anotación consistente como sello de identidad.',
+  'Tec Puebla': 'Tec Puebla combina el sistema Tec con el talento de la región poblana, construyendo un equipo competitivo en la conferencia Centro.',
+  'UANL': 'UANL es el programa más grande del Norte en términos de infraestructura universitaria — con capacidad para reclutar talento de toda la región noreste.',
+  'Anáhuac Xalapa': 'Anáhuac Xalapa es el representante del Sur en el grupo de equipos históricos de la ABE, con una identidad propia forjada en el baloncesto veracruzano.',
+  'Tec Toluca': 'Tec Toluca es un programa en construcción que busca establecerse en la zona Centro con un juego moderno y veloz.',
+  'UACJ': 'UACJ (Ciudad Juárez) trae la intensidad fronteriza a la ABE — un equipo físico que suele complicarle la vida a cualquier rival en su cancha.',
+  'CETYS Mexicali': 'CETYS Mexicali es un programa con tradición bajacaliforniana que ha representado históricamente la competitividad del noroeste del país.',
+  'Montrer': 'Montrer es uno de los programas emergentes del Bajío que busca consolidarse entre los ocho grandes del torneo.',
+  'UP México': 'UP México (Universidad Panamericana) tiene un modelo deportivo que prioriza el desarrollo integral del atleta en la Ciudad de México.',
+  'UMAD': 'UMAD es un programa que ha venido creciendo dentro de la ABE, apostando por un estilo de juego dinámico y competitivo en la conferencia Centro.',
+  'Interamericana': 'Interamericana busca consolidarse en la ABE con un proyecto que mezcla juventud y hambre de competir en cada jornada.',
+  'UV': 'UV (Universidad Veracruzana) es una institución icónica del deporte universitario mexicano, con una historia rica aunque está en proceso de reconstrucción competitiva en la ABE.',
+  'Tec Guadalajara': 'Tec Guadalajara representa a la capital tapatía dentro del sistema Tec — un programa que va en crecimiento dentro de la conferencia Bajío.',
+  'Tec Monterrey F': 'Tec Monterrey Femenil es el programa dominante del norte — con un sistema defensivo asfixiante y una cultura ganadora que lo convierte en favorito temporada tras temporada.',
+  'Tec CEM F': 'Tec CEM Femenil es la referencia del Centro Escolar del Lago, un programa que combina disciplina táctica con atletismo y velocidad en la cancha.',
+  'Anáhuac Norte F': 'Anáhuac Norte Femenil es uno de los programas más completos de la Ciudad de México, con un estilo físico e intenso que suele definir partidos en los cuartos finales.',
+  'CETYS Tijuana F': 'CETYS Tijuana Femenil trae la intensidad fronteriza a la rama femenil — un equipo con identidad clara y gran motivación cuando juega de local.',
+  'UANL F': 'UANL Femenil es el programa referente del noreste — con acceso a talento regional amplio y un estilo de juego que mezcla físico con sistema ofensivo definido.',
+  'Modelo de Mérida F': 'Modelo de Mérida Femenil es el representante del Sureste — un equipo con identidad propia que lleva el baloncesto yucateco a la máxima división universitaria.',
+  'Tec Guadalajara F': 'Tec Guadalajara Femenil representa a Jalisco dentro del sistema Tec — un programa en desarrollo que busca escalar posiciones en la conferencia Bajío.',
+  'UVAQ F': 'UVAQ (Universidad Vasco de Quiroga) Femenil es un programa michoacano que compite con orgullo regional en la ABE, apostando por el talento local.',
+  'Tec Toluca F': 'Tec Toluca Femenil compite en la conferencia Centro con un estilo ofensivo que busca el ritmo alto y la generación de ventajas desde el perímetro.',
+  'UDLAP F': 'UDLAP Femenil mantiene la identidad académico-deportiva de las Américas Puebla, con un estilo colectivo y bien organizado defensivamente.',
+  'Interamericana F': 'Interamericana Femenil es un programa que lucha partido a partido para mantenerse competitivo, con un estilo de juego basado en el esfuerzo colectivo.',
+  'UPAEP F': 'UPAEP Femenil trae el sabor poblano a la rama femenil — un equipo que anota, pero que necesita equilibrar su propuesta en ambos lados de la cancha.',
+  'Tec Hidalgo F': 'Tec Hidalgo Femenil es un programa en construcción dentro de la región Centro, que busca su primera clasificación seria al Ocho Grandes.',
+  'Anáhuac Sur F': 'Anáhuac Sur Femenil compite en la conferencia Centro con una identidad en formación — un programa joven que busca establecer su huella en la ABE.',
+  'UDEM F': 'UDEM Femenil (Universidad de Monterrey) busca escalar dentro de la competida conferencia Norte, enfrentando a algunos de los programas más fuertes del país.'
+};
+
+function generarAnalisis(eq, data, gen) {
+  const pj = eq.pj, pg = eq.pg, pp = eq.pp, pf = eq.pf, pc = eq.pc;
+  const ppj = pf/pj, pcpj = pc/pj, dif = pf-pc, difpj = dif/pj;
+  const winPct = pg/pj;
+  const total = data.length;
+  const pos = eq.r;
+  const ligaPromO = data.reduce(function(s,t){return s+t.pf/t.pj;},0)/total;
+  const ligaPromD = data.reduce(function(s,t){return s+t.pc/t.pj;},0)/total;
+  const enOcho = pos <= 8;
+  const bordeOcho = pos === 8 || pos === 9;
+
+  // ---- CONTEXTO POSICIONAL ----
+  var ctx = '';
+  if (pg === pj) {
+    ctx = 'Invicto en lo que va de la temporada con ' + pg + ' victorias en ' + pj + ' juegos — el mejor arranque posible. La pregunta no es si llega al Ocho Grandes, sino con qué nivel llega.';
+  } else if (pp === pj) {
+    ctx = 'Un arranque difícil: ' + pp + ' derrotas en ' + pj + ' juegos lo ubican en el fondo de la tabla. Con ' + (18-pj) + ' jornadas restantes hay margen para reaccionar, pero el tiempo apremia.';
+  } else if (winPct >= 0.75) {
+    ctx = 'Sólido arranque de temporada con ' + pg + '-' + pp + ' — uno de los registros más fuertes de la liga. Está bien posicionado para el Ocho Grandes y con momentum a su favor.';
+  } else if (winPct >= 0.5 && enOcho) {
+    ctx = 'Con ' + pg + '-' + pp + ' está dentro de la zona de clasificación al Ocho Grandes, pero la tabla está apretada. Cada juego de aquí en adelante pesa doble.';
+  } else if (winPct === 0.5 && bordeOcho) {
+    ctx = 'Parado justo en la línea del corte con marca de ' + pg + '-' + pp + '. Un par de victorias seguidas lo consolidan adentro; dos derrotas lo mandan al grupo de los que pelean por su vida.';
+  } else if (winPct < 0.5 && !enOcho) {
+    ctx = 'Con ' + pg + '-' + pp + ' está fuera del Ocho Grandes en este momento. No hay margen para más tropiezos — necesita una racha ganadora en las próximas jornadas para voltear la situación.';
+  } else {
+    ctx = 'Registro de ' + pg + '-' + pp + ' que lo mantiene en zona de clasificación, aunque sin el colchón de un buen arranque. La consistencia será clave en la segunda mitad de la temporada regular.';
+  }
+
+  // ---- ANÁLISIS OFENSIVO ----
+  var ofen = '';
+  var ofTag = '';
+  if (ppj >= 85) {
+    ofTag = 'CAÑONERO';
+    ofen = 'Ofensivamente es una máquina: ' + ppj.toFixed(1) + ' puntos por juego lo ubican ' + (ppj-ligaPromO).toFixed(1) + ' puntos por encima del promedio de la liga. Genera anotación de forma consistente y desde múltiples fuentes — difícil de detener cuando está en ritmo.';
+  } else if (ppj >= 77) {
+    ofTag = 'EFICIENTE';
+    ofen = 'Ataque sólido y por encima del promedio con ' + ppj.toFixed(1) + ' puntos por juego. No es el equipo más espectacular en ofensiva, pero anota lo suficiente para ganar la mayoría de sus partidos.';
+  } else if (ppj >= 70) {
+    ofTag = 'MODERADO';
+    ofen = 'Producción ofensiva en la media de la liga con ' + ppj.toFixed(1) + ' puntos por juego. Para competir entre los mejores necesita elevar su generación de puntos, especialmente en momentos de presión.';
+  } else {
+    ofTag = 'LIMITADO';
+    ofen = 'La ofensiva es el área de mayor preocupación: solo ' + ppj.toFixed(1) + ' puntos por juego — ' + (ligaPromO-ppj).toFixed(1) + ' puntos por debajo del promedio de la liga. Necesita encontrar consistencia anotadora para ser competitivo.';
+  }
+
+  // ---- ANÁLISIS DEFENSIVO ----
+  var defe = '';
+  var defTag = '';
+  if (pcpj <= 65) {
+    defTag = 'FORTALEZA';
+    defe = 'Su defensa es su arma diferencial: solo ' + pcpj.toFixed(1) + ' puntos permitidos por juego — ' + (ligaPromD-pcpj).toFixed(1) + ' menos que el promedio. Un equipo que gana por asfixiar al rival y controlar el marcador.';
+  } else if (pcpj <= 73) {
+    defTag = 'COMPETITIVA';
+    defe = 'Defensa confiable que permite ' + pcpj.toFixed(1) + ' puntos por juego. No siempre apaga al rival por completo, pero mantiene los marcadores manejables y no se regala puntos fáciles.';
+  } else if (pcpj <= 80) {
+    defTag = 'PERMEABLE';
+    defe = 'El lado defensivo muestra fisuras: ' + pcpj.toFixed(1) + ' puntos permitidos por juego es una cifra que los rivales con buena ofensiva van a explotar. Necesita mayor concentración defensiva en sus rotaciones.';
+  } else {
+    defTag = 'VULNERABLE';
+    defe = 'La defensa es el talón de Aquiles con ' + pcpj.toFixed(1) + ' puntos permitidos por juego — ' + (pcpj-ligaPromD).toFixed(1) + ' por encima del promedio. Si no corrige este problema, los partidos se van a decidir por quién anota más, no por quién defiende mejor.';
+  }
+
+  // ---- DIFERENCIAL ----
+  var difTxt = '';
+  if (dif > 30) {
+    difTxt = 'El diferencial de ' + (dif>0?'+':'') + dif + ' puntos en ' + pj + ' juegos habla de dominio real — no está ganando de milagro, está ganando bien.';
+  } else if (dif > 10) {
+    difTxt = 'Diferencial de ' + (dif>0?'+':'') + dif + ' puntos en total — positivo y consistente, señal de que sus victorias han sido contundentes.';
+  } else if (dif >= 0) {
+    difTxt = 'Diferencial de ' + (dif>0?'+':'') + dif + ' puntos — en terreno positivo pero ajustado. Sus partidos han sido competidos y el margen es estrecho.';
+  } else if (dif >= -20) {
+    difTxt = 'Diferencial negativo de ' + dif + ' puntos: está perdiendo más de lo que gana en el marcador, y eso se refleja en su posición en la tabla.';
+  } else {
+    difTxt = 'Diferencial de ' + dif + ' puntos es de los más negativos de la liga. Los números dicen que hay una brecha real de nivel que hay que cerrar.';
+  }
+
+  // ---- PROYECCIÓN / VEREDICTO ----
+  var veredicto = '';
+  var jRestantes = 18 - pj;
+  if (pg === pj && pj >= 3) {
+    veredicto = 'VEREDICTO: Candidato real al campeonato. La clave será mantener la intensidad cuando lleguen los rivales de mayor calibre en la recta final.';
+  } else if (winPct >= 0.75 && enOcho) {
+    veredicto = 'VEREDICTO: Clasificado virtual al Ocho Grandes. El objetivo ahora es terminar en los primeros cuatro lugares para tener ventaja de sede en los playoffs.';
+  } else if (enOcho && winPct >= 0.5) {
+    veredicto = 'VEREDICTO: Dentro del corte por ahora, pero sin margen de error. Con ' + jRestantes + ' jornadas restantes, cualquier tropiezo puede costarle la clasificación.';
+  } else if (bordeOcho) {
+    veredicto = 'VEREDICTO: Zona de peligro. Una victoria más lo consolida; una derrota más lo complica seriamente. Los próximos dos juegos serán definitorios.';
+  } else if (!enOcho && winPct >= 0.4) {
+    veredicto = 'VEREDICTO: Fuera del corte pero con ' + jRestantes + ' juegos para reaccionar. Necesita al menos ' + Math.ceil((8-pg)+1) + ' victorias más y que los de arriba tropiecen para colarse.';
+  } else if (pp === pj) {
+    veredicto = 'VEREDICTO: Temporada en crisis. La prioridad debe ser encontrar consistencia y orgullo competitivo — y construir desde ahí para lo que viene.';
+  } else {
+    veredicto = 'VEREDICTO: Temporada complicada. Las matemáticas aún dan, pero se necesita una reacción inmediata y sostenida para hacer algo en la tabla.';
+  }
+
+  // ---- FORTALEZA Y DEBILIDAD DESTACADA ----
+  var forte = '', debil = '';
+  // Fortaleza = lo que más destaca positivamente
+  if (ppj >= ligaPromO + 5 && pcpj <= ligaPromD) {
+    forte = 'FORTALEZA CLAVE: Combinación letal de buena ofensiva y buena defensa — el perfil del equipo campeón.';
+  } else if (ppj >= ligaPromO + 5) {
+    forte = 'FORTALEZA CLAVE: Potencia ofensiva que puede liquidar partidos en cualquier momento — su mayor arma.';
+  } else if (pcpj <= ligaPromD - 5) {
+    forte = 'FORTALEZA CLAVE: Defensa de élite que hace sufrir a cualquier rival — su identidad ganadora está en ese lado de la cancha.';
+  } else if (winPct >= 0.75) {
+    forte = 'FORTALEZA CLAVE: Capacidad de ganar incluso cuando no juega perfecto — señal de madurez competitiva.';
+  } else if (ppj >= ligaPromO) {
+    forte = 'FORTALEZA CLAVE: Producción ofensiva por encima del promedio que le da opciones de ganar cualquier partido.';
+  } else {
+    forte = 'FORTALEZA CLAVE: La presencia en la liga y la experiencia acumulada es el punto de partida para construir algo mejor.';
+  }
+
+  // Debilidad = lo que más hay que corregir
+  if (pcpj >= ligaPromD + 8 && ppj <= ligaPromO) {
+    debil = 'AREA DE MEJORA: Tanto la ofensiva como la defensiva están por debajo del promedio — hay trabajo en todos los aspectos del juego.';
+  } else if (pcpj >= ligaPromD + 8) {
+    debil = 'AREA DE MEJORA: La defensa está regalando demasiados puntos. Sin corregir eso, los rivales van a encontrar siempre la forma de empatar o voltear los partidos.';
+  } else if (ppj <= ligaPromO - 8) {
+    debil = 'AREA DE MEJORA: La sequía ofensiva es el mayor obstáculo. Necesita encontrar más fuentes de anotación y fluidez en su ataque para no depender solo de la defensa.';
+  } else if (pp >= pg && dif < 0) {
+    debil = 'AREA DE MEJORA: El problema no es solo el marcador — es la consistencia. Cuando la presión aprieta, el equipo no está encontrando las respuestas.';
+  } else if (bordeOcho) {
+    debil = 'AREA DE MEJORA: La inconsistencia en los momentos clave. Un equipo tan parejo en la tabla necesita definir con claridad qué tipo de equipo quiere ser.';
+  } else {
+    debil = 'AREA DE MEJORA: Encontrar mayor regularidad en el rendimiento — reducir los altibajos que cuestan puntos en los momentos importantes.';
+  }
+
+  // ---- IDENTIDAD ----
+  var identidad = IDENTIDAD[eq.n] || (eq.n + ' es un programa universitario que compite en la Liga ABE División I.');
+
+  // ---- ENSAMBLAR ----
+  var html = '';
+  html += '<p style="color:#94a3b8;font-size:.8rem;margin-bottom:12px">ANÁLISIS · ' + eq.n.toUpperCase() + ' · ' + gen.toUpperCase() + ' · J' + pj + ' DE 18</p>';
+  html += '<p style="margin-bottom:10px">' + identidad + '</p>';
+  html += '<p style="margin-bottom:10px">' + ctx + '</p>';
+  html += '<p style="margin-bottom:4px"><span style="background:rgba(100,220,180,.15);color:#64dcb4;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700">OFENSIVA · ' + ofTag + '</span></p>';
+  html += '<p style="margin-bottom:10px">' + ofen + '</p>';
+  html += '<p style="margin-bottom:4px"><span style="background:rgba(100,160,255,.15);color:#64a0ff;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700">DEFENSIVA · ' + defTag + '</span></p>';
+  html += '<p style="margin-bottom:10px">' + defe + '</p>';
+  html += '<p style="margin-bottom:10px;color:#c4cfe4">' + difTxt + '</p>';
+  html += '<p style="margin-bottom:8px">' + forte + '</p>';
+  html += '<p style="margin-bottom:12px">' + debil + '</p>';
+  html += '<p style="background:rgba(255,255,255,.05);border-left:3px solid #64dcb4;padding:10px 14px;border-radius:0 8px 8px 0;font-weight:600;color:#e2e8f0">' + veredicto + '</p>';
+  return html;
+}
+
 
 // ============================================================
 // BRACKET

@@ -1682,29 +1682,31 @@ function simular() {
   const iV = parseInt(document.getElementById('simVis')?.value||1);
   const local = data[iL], vis = data[iV];
 
-  // Pts/jgo reales de cada equipo
-  const base_l = local.pf / local.pj;
-  const base_v = vis.pf / vis.pj;
+  // ── Métricas de la liga ─────────────────────────────────────
+  const avgPC  = data.reduce((s,e)=>s+e.pc/e.pj,0)/data.length;
+  const avgWin = data.reduce((s,e)=>s+e.pg/e.pj,0)/data.length;
+  const cl = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
 
-  // Factor defensivo del RIVAL: cuánto deja anotar respecto al promedio de la liga
-  // Rival concede MÁS que el promedio → factor > 1 (rival anota más de lo esperado)
-  // Rival concede MENOS que el promedio → factor < 1 (rival anota menos)
-  const avgPC = data.reduce((s,e)=>s+e.pc/e.pj,0)/data.length; // promedio liga
-  // defRivLocal: factor defensivo que ENFRENTA el local (la defensa del visitante)
-  const defRivLocal = (vis.pc / vis.pj) / avgPC;  // > 1 = visita mala defensa → local anota más
-  // defRivVis: factor defensivo que ENFRENTA el visitante (la defensa del local)
-  const defRivVis   = (local.pc / local.pj) / avgPC; // > 1 = local mala defensa → visita anota más
+  // Puntos esperados:  PPG_propio × defRatio_rival × forma × ventaja_local
+  // defRatio > 1 → rival concede más de lo normal → atacante anota más
+  // defRatio < 1 → rival tiene buena defensa      → atacante anota menos
+  // forma 0.85–1.15: win% propio vs promedio liga
+  const defRatio_l = cl((vis.pc   / vis.pj)  / avgPC, 0.80, 1.25);
+  const defRatio_v = cl((local.pc / local.pj) / avgPC, 0.80, 1.25);
+  const forma_l = cl(0.85 + 0.30*((local.pg/local.pj)/Math.max(avgWin,0.01)), 0.85, 1.15);
+  const forma_v = cl(0.85 + 0.30*((vis.pg  /vis.pj  )/Math.max(avgWin,0.01)), 0.85, 1.15);
 
-  // Ventaja local: +3% en promedio de puntos
-  const ventajaLocal = 1.03;
+  const exp_l = (local.pf/local.pj) * defRatio_l * forma_l * 1.02; // +2% ventaja local
+  const exp_v = (vis.pf  /vis.pj)   * defRatio_v * forma_v;
 
-  // Simular por cuartos con variabilidad realista (±12%)
+  const ventajaLocal = 1.0; // ya incluida en exp_l
+
+  // Simular por cuartos con variabilidad realista (±13%)
   const quarters = Array(4).fill(0).map(() => {
-    // Local: su ofensiva * factor defensivo del visitante (mala def rival → local anota más) * ventaja local * ruido
-    const ql = Math.round((base_l/4) * defRivLocal * ventajaLocal * (0.88 + Math.random()*0.24));
-    // Visitante: su ofensiva * factor defensivo del local (mala def rival → visita anota más) * ruido
-    const qv = Math.round((base_v/4) * defRivVis * (0.88 + Math.random()*0.24));
-    return {l: Math.max(12, ql), v: Math.max(11, qv)}; // mínimo 12 pts por cuarto
+    const ql = Math.round((exp_l/4) * (0.87 + Math.random()*0.26));
+    const qv = Math.round((exp_v/4) * (0.87 + Math.random()*0.26));
+    // Mínimo 8 pts por cuarto (32 partido — evitar inflar equipos débiles)
+    return {l: Math.max(8, ql), v: Math.max(8, qv)};
   });
 
   let totL = quarters.reduce((s,q)=>s+q.l,0);
@@ -1716,8 +1718,8 @@ function simular() {
   while (totL === totV && otCount < 3) {
     otCount++;
     // OT: ~5 pts por equipo (periodo corto de 5 min)
-    const otL = Math.round((base_l/4) * 0.35 * defRivLocal * ventajaLocal * (0.8 + Math.random()*0.4));
-    const otV = Math.round((base_v/4) * 0.35 * defRivVis * (0.8 + Math.random()*0.4));
+    const otL = Math.round((exp_l/4) * 0.35 * (0.8 + Math.random()*0.4));
+    const otV = Math.round((exp_v/4) * 0.35 * (0.8 + Math.random()*0.4));
     // Asegurar que no queden iguales en OT (al menos 1 de diferencia)
     const otLf = Math.max(4, otL);
     const otVf = otL === otV ? Math.max(4, otV + (Math.random()>0.5?1:-1)) : Math.max(4, otV);

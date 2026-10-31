@@ -1701,13 +1701,27 @@ function simular() {
 
   const ventajaLocal = 1.0; // ya incluida en exp_l
 
-  // Simular por cuartos con variabilidad realista (±13%)
-  const quarters = Array(4).fill(0).map(() => {
-    const ql = Math.round((exp_l/4) * (0.87 + Math.random()*0.26));
-    const qv = Math.round((exp_v/4) * (0.87 + Math.random()*0.26));
-    // Mínimo 8 pts por cuarto (32 partido — evitar inflar equipos débiles)
-    return {l: Math.max(8, ql), v: Math.max(8, qv)};
-  });
+  // Simular por cuartos con ritmo dinámico:
+  // Cuando un equipo va ganando por mucho, baja el ritmo (saca titulares, juega lento).
+  // El equipo que va perdiendo puede subir el ritmo o desmoronarse.
+  let acumL = 0, acumV = 0;
+  const quarters = [];
+  for (let q = 0; q < 4; q++) {
+    const diff = acumL - acumV; // positivo = local va ganando
+    // Factor de ritmo: el líder baja intensidad cuando la ventaja supera ~15 pts
+    // El perdedor sube un poco el ritmo si va perdiendo (desesperación) pero no tanto
+    const ritmL = diff > 15 ? Math.max(0.82, 1 - (diff - 15) * 0.008)  // líder enfría
+                : diff < -15 ? Math.min(1.05, 1 + (-diff - 15) * 0.004) // local reacciona
+                : 1.0;
+    const ritmV = diff < -15 ? Math.max(0.82, 1 - (-diff - 15) * 0.008) // líder (vis) enfría
+                : diff > 15  ? Math.min(1.04, 1 + (diff - 15) * 0.003)  // vis intenta remontar
+                : 1.0;
+    const ql = Math.round((exp_l/4) * ritmL * (0.87 + Math.random()*0.26));
+    const qv = Math.round((exp_v/4) * ritmV * (0.87 + Math.random()*0.26));
+    const qlf = Math.max(8, ql), qvf = Math.max(8, qv);
+    quarters.push({l: qlf, v: qvf});
+    acumL += qlf; acumV += qvf;
+  }
 
   let totL = quarters.reduce((s,q)=>s+q.l,0);
   let totV = quarters.reduce((s,q)=>s+q.v,0);

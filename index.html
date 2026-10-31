@@ -1693,8 +1693,9 @@ function simular() {
   // forma 0.85–1.15: win% propio vs promedio liga
   const defRatio_l = cl((vis.pc   / vis.pj)  / avgPC, 0.80, 1.25);
   const defRatio_v = cl((local.pc / local.pj) / avgPC, 0.80, 1.25);
-  const forma_l = cl(0.85 + 0.30*((local.pg/local.pj)/Math.max(avgWin,0.01)), 0.85, 1.15);
-  const forma_v = cl(0.85 + 0.30*((vis.pg  /vis.pj  )/Math.max(avgWin,0.01)), 0.85, 1.15);
+  // forma centrada en 1.0: equipo promedio = 1.0, mejor récord > 1, peor récord < 1
+  const forma_l = cl(1.0 + 0.25*((local.pg/local.pj - avgWin)/Math.max(avgWin,0.01)), 0.80, 1.20);
+  const forma_v = cl(1.0 + 0.25*((vis.pg  /vis.pj   - avgWin)/Math.max(avgWin,0.01)), 0.80, 1.20);
 
   const exp_l = (local.pf/local.pj) * defRatio_l * forma_l * 1.02; // +2% ventaja local
   const exp_v = (vis.pf  /vis.pj)   * defRatio_v * forma_v;

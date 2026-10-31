@@ -860,8 +860,9 @@ var JUEGOS_V = [
   {l:11,v:14,pl:58, pv:65, j:1},
   {l:15,v:16,pl:68, pv:60, j:1},
   {l:17,v:18,pl:64, pv:58, j:1},
-  // Jornada 8 — CONFIRMADO
+  // Jornada 8 — CONFIRMADOS
   {l:0, v:13,pl:91, pv:50, j:8},
+  {l:10,v:18,pl:70, pv:58, j:8},
 ];
 
 var JUEGOS_F = [
@@ -869,6 +870,23 @@ var JUEGOS_F = [
 ];
 
 function getJuegos(genero) { return genero === 'M' ? JUEGOS_V : JUEGOS_F; }
+
+// RACHA: victorias/derrotas consecutivas al final — positivo=racha ganadora, negativo=racha perdedora
+function calcRacha(juegos, idx) {
+  const propios = juegos
+    .filter(p => p.l === idx || p.v === idx)
+    .sort((a, b) => a.j - b.j);
+  if (!propios.length) return 0;
+  let racha = 0, dir = null;
+  for (let k = propios.length - 1; k >= 0; k--) {
+    const p = propios[k];
+    const gano = (p.l === idx ? p.pl : p.pv) > (p.l === idx ? p.pv : p.pl);
+    if (dir === null) { dir = gano ? 'W' : 'L'; racha = gano ? 1 : -1; }
+    else if ((dir === 'W' && gano) || (dir === 'L' && !gano)) racha += (dir === 'W' ? 1 : -1);
+    else break;
+  }
+  return racha;
+}
 
 // SOS: win% promedio de los rivales que enfrentó un equipo
 // Si jugaste contra el fondo → SOS bajo → tu poder real se ajusta a la baja
@@ -1785,6 +1803,12 @@ function simular() {
     exp_l += ajuste;
     exp_v -= ajuste;
   }
+
+  // RACHA: equipo caliente recibe boost, equipo frío recibe penalización (máx ±3%)
+  const rachaL = calcRacha(juegos, iL);
+  const rachaV = calcRacha(juegos, iV);
+  exp_l *= Math.max(0.97, Math.min(1.03, 1 + rachaL * 0.004));
+  exp_v *= Math.max(0.97, Math.min(1.03, 1 + rachaV * 0.004));
 
   const ventajaLocal = 1.0; // ya incluida en exp_l
 

@@ -1684,21 +1684,31 @@ function simular() {
 
   // ── Métricas de la liga ─────────────────────────────────────
   const avgPC  = data.reduce((s,e)=>s+e.pc/e.pj,0)/data.length;
-  const avgWin = data.reduce((s,e)=>s+e.pg/e.pj,0)/data.length;
   const cl = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
 
-  // Puntos esperados:  PPG_propio × defRatio_rival × forma × ventaja_local
-  // defRatio > 1 → rival concede más de lo normal → atacante anota más
-  // defRatio < 1 → rival tiene buena defensa      → atacante anota menos
-  // forma 0.85–1.15: win% propio vs promedio liga
+  // Índice de poder compuesto: mismo cálculo que el Lab (tempScore)
+  // Incorpora victorias, ataque, defensa, diferencial y ratio PF/PC
+  // → equipo que ganó contra débiles tendrá peor diferencial y ratio → poder más bajo
+  const _w  = e => e.pg/e.pj,  _pts = e => e.pf/e.pj,
+        _pc = e => e.pc/e.pj,  _dif = e => (e.pf-e.pc)/e.pj, _rat = e => e.pf/e.pc;
+  const _aW=data.map(_w),_aP=data.map(_pts),_aC=data.map(_pc),_aD=data.map(_dif),_aR=data.map(_rat);
+  const _norm=(v,a)=>{const mn=Math.min(...a),mx=Math.max(...a);return mx===mn?0.5:(v-mn)/(mx-mn);};
+  const poderScore = e => (_norm(_w(e),_aW)*0.30 + _norm(_pts(e),_aP)*0.20
+    + (1-_norm(_pc(e),_aC))*0.20 + _norm(_dif(e),_aD)*0.20 + _norm(_rat(e),_aR)*0.10);
+  const avgPoder = data.reduce((s,e)=>s+poderScore(e),0)/data.length;
+
+  // Factor de poder: k=0.15 → calibrado para margen realista (~51 pts para SF vs GDL, real 41)
+  // Centrado en 1.0: mejor equipo de la liga ≈ 1.08, peor ≈ 0.92
+  const k = 0.15;
+  const poder_l = cl(1.0 + k*((poderScore(local) - avgPoder)/Math.max(avgPoder,0.01)), 0.88, 1.12);
+  const poder_v = cl(1.0 + k*((poderScore(vis)   - avgPoder)/Math.max(avgPoder,0.01)), 0.88, 1.12);
+
+  // Ratio defensivo: qué tanto concede el rival vs el promedio de la liga
   const defRatio_l = cl((vis.pc   / vis.pj)  / avgPC, 0.80, 1.25);
   const defRatio_v = cl((local.pc / local.pj) / avgPC, 0.80, 1.25);
-  // forma centrada en 1.0: equipo promedio = 1.0, mejor récord > 1, peor récord < 1
-  const forma_l = cl(1.0 + 0.25*((local.pg/local.pj - avgWin)/Math.max(avgWin,0.01)), 0.80, 1.20);
-  const forma_v = cl(1.0 + 0.25*((vis.pg  /vis.pj   - avgWin)/Math.max(avgWin,0.01)), 0.80, 1.20);
 
-  const exp_l = (local.pf/local.pj) * defRatio_l * forma_l * 1.02; // +2% ventaja local
-  const exp_v = (vis.pf  /vis.pj)   * defRatio_v * forma_v;
+  const exp_l = (local.pf/local.pj) * defRatio_l * poder_l * 1.02; // +2% ventaja local
+  const exp_v = (vis.pf  /vis.pj)   * defRatio_v * poder_v;
 
   const ventajaLocal = 1.0; // ya incluida en exp_l
 

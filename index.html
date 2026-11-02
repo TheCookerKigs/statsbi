@@ -806,26 +806,26 @@ var TEMPORADAS = {
 };
 
 var VARONIL = [
-  {r:1,n:'Tec Santa Fe',c:'Centro',pg:9,pp:1,pj:10,pf:828,pc:714},
-  {r:2,n:'Tec Monterrey',c:'Norte',pg:8,pp:1,pj:9,pf:642,pc:515},
-  {r:3,n:'CEU',c:'Norte',pg:8,pp:2,pj:10,pf:780,pc:633},
-  {r:4,n:'Anáhuac Querétaro',c:'Bajío',pg:7,pp:2,pj:9,pf:819,pc:731},
-  {r:5,n:'Tec Toluca',c:'Centro',pg:7,pp:2,pj:9,pf:698,pc:646},
-  {r:6,n:'UANL',c:'Norte',pg:7,pp:2,pj:9,pf:609,pc:546},
-  {r:7,n:'UPAEP',c:'Centro',pg:7,pp:2,pj:9,pf:707,pc:656},
-  {r:8,n:'Tec Puebla',c:'Centro',pg:5,pp:4,pj:9,pf:663,pc:621},
-  {r:9,n:'Interamericana',c:'Sur',pg:4,pp:5,pj:9,pf:594,pc:594},
-  {r:10,n:'UDLAP',c:'Bajío',pg:4,pp:6,pj:10,pf:663,pc:725},
-  {r:11,n:'UMAD',c:'Centro',pg:4,pp:6,pj:10,pf:757,pc:743},
-  {r:12,n:'Tec Guadalajara',c:'Pacífico',pg:3,pp:6,pj:9,pf:678,pc:739},
-  {r:13,n:'Montrer',c:'Norte',pg:3,pp:6,pj:9,pf:552,pc:608},
-  {r:14,n:'UACJ',c:'Norte',pg:3,pp:7,pj:10,pf:624,pc:706},
-  {r:15,n:'UANE',c:'Norte',pg:3,pp:7,pj:10,pf:613,pc:700},
-  {r:16,n:'CETYS Mexicali',c:'Pacífico',pg:3,pp:8,pj:11,pf:745,pc:782},
-  {r:17,n:'UP México',c:'Centro',pg:2,pp:8,pj:10,pf:598,pc:675},
-  {r:18,n:'UV',c:'Sur',pg:2,pp:8,pj:10,pf:591,pc:746},
-  {r:19,n:'Anáhuac Xalapa',c:'Sur',pg:2,pp:8,pj:10,pf:640,pc:721}
-];
+  {r:1, n:'Tec Santa Fe',       c:'Centro',   pg:10,pp:1, pj:11,pf:919,pc:765},
+  {r:2, n:'Tec Monterrey',      c:'Norte',    pg:9, pp:2, pj:11,pf:806,pc:659},
+  {r:3, n:'CEU',                c:'Norte',    pg:9, pp:2, pj:11,pf:858,pc:707},
+  {r:4, n:'Anáhuac Querétaro',  c:'Bajío',    pg:7, pp:4, pj:11,pf:968,pc:904},
+  {r:5, n:'Tec Toluca',         c:'Centro',   pg:8, pp:2, pj:10,pf:780,pc:725},
+  {r:6, n:'UANL',               c:'Norte',    pg:9, pp:2, pj:11,pf:754,pc:681},
+  {r:7, n:'UPAEP',              c:'Centro',   pg:7, pp:4, pj:11,pf:853,pc:814},
+  {r:8, n:'Tec Puebla',         c:'Centro',   pg:7, pp:4, pj:11,pf:820,pc:772},
+  {r:9, n:'Interamericana',     c:'Sur',      pg:6, pp:5, pj:11,pf:778,pc:737},
+  {r:10,n:'UDLAP',              c:'Bajío',    pg:5, pp:7, pj:12,pf:810,pc:895},
+  {r:11,n:'UMAD',               c:'Centro',   pg:5, pp:7, pj:12,pf:894,pc:873},
+  {r:12,n:'Montrer',            c:'Norte',    pg:4, pp:7, pj:11,pf:682,pc:744},
+  {r:13,n:'UACJ',               c:'Norte',    pg:3, pp:9, pj:12,pf:758,pc:867},
+  {r:14,n:'Tec Guadalajara',    c:'Pacífico', pg:3, pp:8, pj:11,pf:808,pc:912},
+  {r:15,n:'UANE',               c:'Norte',    pg:4, pp:7, pj:11,pf:696,pc:760},
+  {r:16,n:'CETYS Mexicali',     c:'Pacífico', pg:3, pp:8, pj:11,pf:745,pc:782},
+  {r:17,n:'UP México',          c:'Centro',   pg:3, pp:9, pj:12,pf:752,pc:835},
+  {r:18,n:'Anáhuac Xalapa',     c:'Sur',      pg:3, pp:9, pj:12,pf:798,pc:876},
+  {r:19,n:'UV',                 c:'Sur',      pg:2, pp:10,pj:12,pf:714,pc:885},
+]
 var FEMENIL = [
   {r:1,n:'Tec Monterrey',c:'Norte',pg:6,pp:0,pj:6,pf:383,pc:249},
   {r:2,n:'CETYS Tijuana',c:'Pacífico',pg:5,pp:0,pj:5,pf:368,pc:282},
@@ -851,19 +851,24 @@ var FEMENIL = [
 // pl = pts local, pv = pts visitante, j = jornada
 // ============================================================
 var JUEGOS_V = [
-  // Jornada 1 (resultados aproximados — reemplazar con reales cuando se obtengan)
-  {l:0, v:4, pl:87, pv:70, j:1},
-  {l:1, v:5, pl:75, pv:68, j:1},
-  {l:2, v:7, pl:80, pv:72, j:1},
-  {l:3, v:9, pl:90, pv:82, j:1},
-  {l:10,v:13,pl:72, pv:68, j:1},
-  {l:11,v:14,pl:58, pv:65, j:1},
-  {l:15,v:16,pl:68, pv:60, j:1},
-  {l:17,v:18,pl:64, pv:58, j:1},
-  // Jornada 8 — CONFIRMADO
-  {l:0, v:13,pl:91, pv:50, j:8},
-];
-
+  // ── Jornada 7 (26 oct – 1 nov 2026) — CONFIRMADOS ──
+  {l:17,v:10,pl:72, pv:67, j:7},
+  {l:13,v:0, pl:51, pv:91, j:7},
+  {l:18,v:7, pl:65, pv:69, j:7},
+  {l:16,v:8, pl:72, pv:83, j:7},
+  {l:3, v:1, pl:68, pv:91, j:7},
+  {l:18,v:10,pl:58, pv:70, j:7},
+  {l:11,v:5, pl:54, pv:63, j:7},
+  {l:12,v:2, pl:74, pv:78, j:7},
+  {l:9, v:6, pl:76, pv:69, j:7},
+  {l:17,v:7, pl:86, pv:88, j:7},
+  {l:11,v:1, pl:76, pv:73, j:7},
+  {l:13,v:4, pl:79, pv:82, j:7},
+  {l:16,v:6, pl:82, pv:77, j:7},
+  {l:9, v:8, pl:71, pv:101,j:7},
+  {l:3, v:5, pl:81, pv:82, j:7},
+  {l:12,v:14,pl:60, pv:83, j:7},
+]
 var JUEGOS_F = [
   // Agregar resultados femenil conforme se conozcan
 ];
